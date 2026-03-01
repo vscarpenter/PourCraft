@@ -21,7 +21,7 @@ xcodegen generate
 xcodebuild -project PourCraft.xcodeproj -scheme PourCraft -sdk iphonesimulator \
   -destination 'platform=iOS Simulator,id=82110447-07A1-44C5-B549-B9ECAB6174CE' build
 
-# Test (21 tests across 2 suites)
+# Test (57 tests across 5 suites)
 xcodebuild -project PourCraft.xcodeproj -scheme PourCraft -sdk iphonesimulator \
   -destination 'platform=iOS Simulator,id=82110447-07A1-44C5-B549-B9ECAB6174CE' test
 
@@ -43,7 +43,7 @@ PourCraft/
 │   ├── PourCraftApp.swift         # @main entry, TabView, @AppStorage persistence
 │   ├── Info.plist
 │   ├── Models/
-│   │   ├── BrewModel.swift        # @Observable: selectedRoast, coffeeWeight, computed water values
+│   │   ├── BrewModel.swift        # @Observable: selectedRoast, coffeeWeight, computed water values, restorePreferences
 │   │   ├── Roast.swift            # enum: light/medium/dark with ratio, flavor, color
 │   │   └── BrewTip.swift          # struct with static allTips array (8 tips)
 │   ├── Views/
@@ -59,10 +59,14 @@ PourCraft/
 │   │   └── Typography.swift       # AppTypography enum: serif display + sans body fonts
 │   ├── Extensions/
 │   │   └── Color+Hex.swift        # Color(hex:) initializer
+│   ├── PrivacyInfo.xcprivacy      # App Store privacy manifest (UserDefaults declaration)
 │   └── Assets.xcassets/           # AccentColor (copper #B87333) + empty AppIcon
 └── PourCraftTests/
     ├── RoastTests.swift           # 6 tests: cases, ratios, labels, Codable, flavors, names
-    └── BrewModelTests.swift       # 15 tests: defaults, reference table, bloom, clamping, temp, steps
+    ├── BrewModelTests.swift       # 29 tests: defaults, reference table, bloom, clamping, formatting, persistence
+    ├── ColorHexTests.swift        # 9 tests: valid/invalid hex parsing, whitespace, empty input
+    ├── BrewTipTests.swift         # 6 tests: tip count, unique IDs, non-empty fields, sequential IDs
+    └── AppColorsTests.swift       # 7 tests: adaptive color helpers for light/dark mode
 ```
 
 ## Architecture Decisions
@@ -70,7 +74,7 @@ PourCraft/
 ### State Management
 - Single `BrewModel` instance created with `@State` in `PourCraftApp`
 - Passed explicitly to `BrewView` (only the Brew tab needs it)
-- `@AppStorage` persistence lives at app level, not in BrewModel — keeps model testable with zero UserDefaults coupling
+- `@AppStorage` persistence lives at app level; restore logic in `BrewModel.restorePreferences()` for testability
 - `.onChange` modifiers sync `selectedRoast` and `temperatureUnit` to UserDefaults
 
 ### @Observable Pattern: Avoid didSet Recursion
