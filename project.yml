@@ -25,6 +25,15 @@ targets:
         SWIFT_EMIT_LOC_STRINGS: "YES"
     info:
       path: PourCraft/Info.plist
+      properties:
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
 
   PourCraftTests:
     type: bundle.unit-test
