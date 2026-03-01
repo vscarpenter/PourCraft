@@ -8,7 +8,7 @@ struct AppColorsTests {
 
     // MARK: - Helpers
 
-    private func rgba(of color: Color) -> (red: Double, green: Double, blue: Double) {
+    private func rgb(of color: Color) -> (red: Double, green: Double, blue: Double) {
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0
@@ -18,48 +18,31 @@ struct AppColorsTests {
     }
 
     private func colorsAreDifferent(_ a: Color, _ b: Color) -> Bool {
-        let lhs = rgba(of: a)
-        let rhs = rgba(of: b)
+        let lhs = rgb(of: a)
+        let rhs = rgb(of: b)
         return abs(lhs.red - rhs.red) > 0.01
             || abs(lhs.green - rhs.green) > 0.01
             || abs(lhs.blue - rhs.blue) > 0.01
     }
 
-    // MARK: - Adaptive Helpers Return Different Colors for Light vs Dark
+    // MARK: - Adaptive Helpers
 
-    @Test("Should return different background colors for light and dark mode")
-    func shouldReturnDifferentBackgrounds() {
-        let light = AppColors.background(for: .light)
-        let dark = AppColors.background(for: .dark)
-        #expect(colorsAreDifferent(light, dark))
+    private func assertDifferentForLightAndDark(
+        _ getter: (ColorScheme) -> Color,
+        name: String
+    ) {
+        let light = getter(.light)
+        let dark = getter(.dark)
+        #expect(colorsAreDifferent(light, dark), "\(name) should differ between light and dark mode")
     }
 
-    @Test("Should return different surface colors for light and dark mode")
-    func shouldReturnDifferentSurfaces() {
-        let light = AppColors.surface(for: .light)
-        let dark = AppColors.surface(for: .dark)
-        #expect(colorsAreDifferent(light, dark))
-    }
-
-    @Test("Should return different primary text colors for light and dark mode")
-    func shouldReturnDifferentPrimaryText() {
-        let light = AppColors.primaryText(for: .light)
-        let dark = AppColors.primaryText(for: .dark)
-        #expect(colorsAreDifferent(light, dark))
-    }
-
-    @Test("Should return different secondary text colors for light and dark mode")
-    func shouldReturnDifferentSecondaryText() {
-        let light = AppColors.secondaryText(for: .light)
-        let dark = AppColors.secondaryText(for: .dark)
-        #expect(colorsAreDifferent(light, dark))
-    }
-
-    @Test("Should return different accent colors for light and dark mode")
-    func shouldReturnDifferentAccent() {
-        let light = AppColors.accent(for: .light)
-        let dark = AppColors.accent(for: .dark)
-        #expect(colorsAreDifferent(light, dark))
+    @Test("Should return different colors for light vs dark across all adaptive helpers")
+    func shouldReturnDifferentColorsForLightVsDark() {
+        assertDifferentForLightAndDark(AppColors.background, name: "background")
+        assertDifferentForLightAndDark(AppColors.surface, name: "surface")
+        assertDifferentForLightAndDark(AppColors.primaryText, name: "primaryText")
+        assertDifferentForLightAndDark(AppColors.secondaryText, name: "secondaryText")
+        assertDifferentForLightAndDark(AppColors.accent, name: "accent")
     }
 
     // MARK: - Light Mode Values Match Design System

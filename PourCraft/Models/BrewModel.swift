@@ -4,7 +4,10 @@ import OSLog
 
 @Observable
 final class BrewModel {
-    private static let logger = Logger(subsystem: "com.pourcraft.app", category: "BrewModel")
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.pourcraft.app",
+        category: "BrewModel"
+    )
 
     var selectedRoast: Roast = .medium
 
