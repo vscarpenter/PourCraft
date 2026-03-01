@@ -49,6 +49,15 @@ struct AboutView: View {
                 )
 
                 Spacer()
+
+                HStack(spacing: 0) {
+                    Text("Crafted by ")
+                        .foregroundStyle(AppColors.secondaryText(for: colorScheme))
+                    Link("Vinny Carpenter", destination: URL(string: "https://vinny.dev/")!)
+                        .foregroundStyle(AppColors.accent(for: colorScheme))
+                }
+                .font(AppTypography.caption)
+                .padding(.bottom, 20)
             }
             .padding(.horizontal, 20)
         }
