@@ -5,8 +5,8 @@ import Testing
 @Suite("Roast")
 struct RoastTests {
 
-    @Test("All roast cases exist")
-    func allCases() {
+    @Test("Should contain exactly three roast cases")
+    func shouldContainThreeRoastCases() {
         let cases = Roast.allCases
         #expect(cases.count == 3)
         #expect(cases.contains(.light))
@@ -14,22 +14,22 @@ struct RoastTests {
         #expect(cases.contains(.dark))
     }
 
-    @Test("Ratios match spec values")
-    func ratios() {
+    @Test("Should have ratios matching spec values")
+    func shouldHaveCorrectRatios() {
         #expect(Roast.light.ratio == 17)
         #expect(Roast.medium.ratio == 16)
         #expect(Roast.dark.ratio == 15)
     }
 
-    @Test("Ratio labels formatted correctly")
-    func ratioLabels() {
+    @Test("Should format ratio labels as 1:N")
+    func shouldFormatRatioLabels() {
         #expect(Roast.light.ratioLabel == "1:17")
         #expect(Roast.medium.ratioLabel == "1:16")
         #expect(Roast.dark.ratioLabel == "1:15")
     }
 
-    @Test("Codable round-trip preserves value")
-    func codableRoundTrip() throws {
+    @Test("Should survive Codable round-trip for all cases")
+    func shouldSurviveCodableRoundTrip() throws {
         for roast in Roast.allCases {
             let data = try JSONEncoder().encode(roast)
             let decoded = try JSONDecoder().decode(Roast.self, from: data)
@@ -37,15 +37,15 @@ struct RoastTests {
         }
     }
 
-    @Test("Each roast has a non-empty flavor profile")
-    func flavorProfiles() {
+    @Test("Should have non-empty flavor profile for each roast")
+    func shouldHaveNonEmptyFlavorProfiles() {
         for roast in Roast.allCases {
             #expect(!roast.flavorProfile.isEmpty)
         }
     }
 
-    @Test("Each roast has a display name")
-    func displayNames() {
+    @Test("Should have correct display names")
+    func shouldHaveCorrectDisplayNames() {
         #expect(Roast.light.displayName == "Light")
         #expect(Roast.medium.displayName == "Medium")
         #expect(Roast.dark.displayName == "Dark")

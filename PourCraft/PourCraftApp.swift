@@ -38,11 +38,6 @@ struct PourCraftApp: App {
     }
 
     private func restorePreferences() {
-        if let roast = Roast(rawValue: savedRoast) {
-            brewModel.selectedRoast = roast
-        }
-        if let unit = TemperatureUnit(rawValue: savedTempUnit) {
-            brewModel.temperatureUnit = unit
-        }
+        brewModel.restorePreferences(savedRoast: savedRoast, savedTempUnit: savedTempUnit)
     }
 }

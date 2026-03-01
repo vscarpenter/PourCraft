@@ -1,8 +1,11 @@
 import Foundation
 import Observation
+import OSLog
 
 @Observable
 final class BrewModel {
+    private static let logger = Logger(subsystem: "com.pourcraft.app", category: "BrewModel")
+
     var selectedRoast: Roast = .medium
 
     // Backing store to avoid @Observable didSet infinite recursion
@@ -55,6 +58,24 @@ final class BrewModel {
             "Total brew time target: 3:00 to 4:00 minutes.",
             "Enjoy your perfect cup!",
         ]
+    }
+
+    // MARK: - Persistence
+
+    /// Restores preferences from raw stored values.
+    /// Invalid or unrecognized values are silently ignored, keeping current defaults.
+    func restorePreferences(savedRoast: String, savedTempUnit: String) {
+        if let roast = Roast(rawValue: savedRoast) {
+            selectedRoast = roast
+        } else if !savedRoast.isEmpty {
+            Self.logger.warning("Ignored unrecognized saved roast: \(savedRoast, privacy: .public)")
+        }
+
+        if let unit = TemperatureUnit(rawValue: savedTempUnit) {
+            temperatureUnit = unit
+        } else if !savedTempUnit.isEmpty {
+            Self.logger.warning("Ignored unrecognized saved temperature unit: \(savedTempUnit, privacy: .public)")
+        }
     }
 
     // MARK: - Helpers

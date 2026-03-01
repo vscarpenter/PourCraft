@@ -6,8 +6,8 @@ struct BrewModelTests {
 
     // MARK: - Default State
 
-    @Test("Default state uses medium roast, 20g, fahrenheit")
-    func defaultState() {
+    @Test("Should default to medium roast, 20g, fahrenheit")
+    func shouldDefaultToExpectedState() {
         let model = BrewModel()
         #expect(model.selectedRoast == .medium)
         #expect(model.coffeeWeight == 20)
@@ -20,27 +20,27 @@ struct BrewModelTests {
     // | Medium | 1:16  | 240g | 320g | 400g | 480g |
     // | Light  | 1:17  | 255g | 340g | 425g | 510g |
 
-    @Test("Dark roast water calculations match spec reference table",
+    @Test("Should match dark roast spec reference table",
           arguments: [(15.0, 225.0), (20.0, 300.0), (25.0, 375.0), (30.0, 450.0)])
-    func darkRoastWater(coffeeWeight: Double, expectedWater: Double) {
+    func shouldCalculateDarkRoastWater(coffeeWeight: Double, expectedWater: Double) {
         let model = BrewModel()
         model.selectedRoast = .dark
         model.coffeeWeight = coffeeWeight
         #expect(model.totalWater == expectedWater)
     }
 
-    @Test("Medium roast water calculations match spec reference table",
+    @Test("Should match medium roast spec reference table",
           arguments: [(15.0, 240.0), (20.0, 320.0), (25.0, 400.0), (30.0, 480.0)])
-    func mediumRoastWater(coffeeWeight: Double, expectedWater: Double) {
+    func shouldCalculateMediumRoastWater(coffeeWeight: Double, expectedWater: Double) {
         let model = BrewModel()
         model.selectedRoast = .medium
         model.coffeeWeight = coffeeWeight
         #expect(model.totalWater == expectedWater)
     }
 
-    @Test("Light roast water calculations match spec reference table",
+    @Test("Should match light roast spec reference table",
           arguments: [(15.0, 255.0), (20.0, 340.0), (25.0, 425.0), (30.0, 510.0)])
-    func lightRoastWater(coffeeWeight: Double, expectedWater: Double) {
+    func shouldCalculateLightRoastWater(coffeeWeight: Double, expectedWater: Double) {
         let model = BrewModel()
         model.selectedRoast = .light
         model.coffeeWeight = coffeeWeight
@@ -49,8 +49,8 @@ struct BrewModelTests {
 
     // MARK: - Bloom Water
 
-    @Test("Bloom water is always 2x coffee weight")
-    func bloomWater() {
+    @Test("Should calculate bloom water as 2x coffee weight")
+    func shouldCalculateBloomWater() {
         let model = BrewModel()
         model.coffeeWeight = 20
         #expect(model.bloomWater == 40)
@@ -59,8 +59,8 @@ struct BrewModelTests {
         #expect(model.bloomWater == 60)
     }
 
-    @Test("Remaining water equals total minus bloom")
-    func remainingWater() {
+    @Test("Should calculate remaining water as total minus bloom")
+    func shouldCalculateRemainingWater() {
         let model = BrewModel()
         model.selectedRoast = .medium
         model.coffeeWeight = 20
@@ -70,31 +70,59 @@ struct BrewModelTests {
 
     // MARK: - Weight Clamping
 
-    @Test("Coffee weight clamps to minimum of 10g")
-    func clampsToMinimum() {
+    @Test("Should clamp weight below minimum to 10g")
+    func shouldClampToMinimum() {
         let model = BrewModel()
         model.coffeeWeight = 5
         #expect(model.coffeeWeight == 10)
     }
 
-    @Test("Coffee weight clamps to maximum of 60g")
-    func clampsToMaximum() {
+    @Test("Should clamp weight above maximum to 60g")
+    func shouldClampToMaximum() {
         let model = BrewModel()
         model.coffeeWeight = 100
         #expect(model.coffeeWeight == 60)
     }
 
-    @Test("Coffee weight accepts valid values without clamping")
-    func validWeightUnchanged() {
+    @Test("Should accept valid weight without clamping")
+    func shouldAcceptValidWeight() {
         let model = BrewModel()
         model.coffeeWeight = 35
         #expect(model.coffeeWeight == 35)
     }
 
+    @Test("Should clamp zero to minimum of 10g")
+    func shouldClampZeroToMinimum() {
+        let model = BrewModel()
+        model.coffeeWeight = 0
+        #expect(model.coffeeWeight == 10)
+    }
+
+    @Test("Should clamp negative values to minimum of 10g")
+    func shouldClampNegativeToMinimum() {
+        let model = BrewModel()
+        model.coffeeWeight = -20
+        #expect(model.coffeeWeight == 10)
+    }
+
+    @Test("Should accept boundary value of exactly 10g")
+    func shouldAcceptExactMinimum() {
+        let model = BrewModel()
+        model.coffeeWeight = 10
+        #expect(model.coffeeWeight == 10)
+    }
+
+    @Test("Should accept boundary value of exactly 60g")
+    func shouldAcceptExactMaximum() {
+        let model = BrewModel()
+        model.coffeeWeight = 60
+        #expect(model.coffeeWeight == 60)
+    }
+
     // MARK: - Temperature Display
 
-    @Test("Temperature range displays correctly for fahrenheit")
-    func fahrenheitRange() {
+    @Test("Should display fahrenheit temperature range")
+    func shouldDisplayFahrenheitRange() {
         let model = BrewModel()
         model.temperatureUnit = .fahrenheit
         #expect(model.temperatureRange.contains("194"))
@@ -102,8 +130,8 @@ struct BrewModelTests {
         #expect(model.temperatureRange.contains("F"))
     }
 
-    @Test("Temperature range displays correctly for celsius")
-    func celsiusRange() {
+    @Test("Should display celsius temperature range")
+    func shouldDisplayCelsiusRange() {
         let model = BrewModel()
         model.temperatureUnit = .celsius
         #expect(model.temperatureRange.contains("90"))
@@ -113,14 +141,14 @@ struct BrewModelTests {
 
     // MARK: - Brew Steps
 
-    @Test("Brew steps contain 8 steps")
-    func brewStepCount() {
+    @Test("Should contain exactly 8 brew steps")
+    func shouldContainEightBrewSteps() {
         let model = BrewModel()
         #expect(model.brewSteps.count == 8)
     }
 
-    @Test("Brew steps include dynamic weight values")
-    func brewStepsDynamicValues() {
+    @Test("Should include dynamic weight values in brew steps")
+    func shouldIncludeDynamicWeightsInSteps() {
         let model = BrewModel()
         model.coffeeWeight = 25
         model.selectedRoast = .medium
@@ -133,16 +161,90 @@ struct BrewModelTests {
 
     // MARK: - Weight Formatting
 
-    @Test("Whole numbers format without decimals")
-    func wholeNumberFormatting() {
+    @Test("Should format whole numbers without decimals")
+    func shouldFormatWholeNumbers() {
         let model = BrewModel()
         #expect(model.formattedWeight(320) == "320")
         #expect(model.formattedWeight(20) == "20")
     }
 
-    @Test("Fractional numbers format with one decimal")
-    func fractionalFormatting() {
+    @Test("Should format fractional numbers with one decimal")
+    func shouldFormatFractionalNumbers() {
         let model = BrewModel()
         #expect(model.formattedWeight(320.5) == "320.5")
+    }
+
+    @Test("Should format zero as whole number")
+    func shouldFormatZero() {
+        let model = BrewModel()
+        #expect(model.formattedWeight(0) == "0")
+    }
+
+    @Test("Should format negative values without crashing")
+    func shouldFormatNegativeValues() {
+        let model = BrewModel()
+        let result = model.formattedWeight(-5)
+        #expect(result == "-5")
+    }
+
+    @Test("Should format small fractional value with one decimal")
+    func shouldFormatSmallFraction() {
+        let model = BrewModel()
+        #expect(model.formattedWeight(0.5) == "0.5")
+    }
+
+    @Test("Should format large values correctly")
+    func shouldFormatLargeValues() {
+        let model = BrewModel()
+        #expect(model.formattedWeight(1000) == "1000")
+        #expect(model.formattedWeight(999.9) == "999.9")
+    }
+
+    // MARK: - Preference Restoration
+
+    @Test("Should restore valid roast from saved string")
+    func shouldRestoreValidRoast() {
+        let model = BrewModel()
+        model.restorePreferences(savedRoast: "dark", savedTempUnit: "fahrenheit")
+        #expect(model.selectedRoast == .dark)
+    }
+
+    @Test("Should restore valid temperature unit from saved string")
+    func shouldRestoreValidTempUnit() {
+        let model = BrewModel()
+        model.restorePreferences(savedRoast: "medium", savedTempUnit: "celsius")
+        #expect(model.temperatureUnit == .celsius)
+    }
+
+    @Test("Should ignore invalid roast string and keep default")
+    func shouldIgnoreInvalidRoast() {
+        let model = BrewModel()
+        let originalRoast = model.selectedRoast
+        model.restorePreferences(savedRoast: "extra-dark", savedTempUnit: "fahrenheit")
+        #expect(model.selectedRoast == originalRoast)
+    }
+
+    @Test("Should ignore invalid temperature unit and keep default")
+    func shouldIgnoreInvalidTempUnit() {
+        let model = BrewModel()
+        let originalUnit = model.temperatureUnit
+        model.restorePreferences(savedRoast: "medium", savedTempUnit: "kelvin")
+        #expect(model.temperatureUnit == originalUnit)
+    }
+
+    @Test("Should ignore empty strings and keep defaults")
+    func shouldIgnoreEmptyStrings() {
+        let model = BrewModel()
+        model.restorePreferences(savedRoast: "", savedTempUnit: "")
+        #expect(model.selectedRoast == .medium)
+        #expect(model.temperatureUnit == .fahrenheit)
+    }
+
+    @Test("Should restore both preferences simultaneously")
+    func shouldRestoreBothPreferences() {
+        let model = BrewModel()
+        model.restorePreferences(savedRoast: "light", savedTempUnit: "celsius")
+        #expect(model.selectedRoast == .light)
+        #expect(model.temperatureUnit == .celsius)
     }
 }
