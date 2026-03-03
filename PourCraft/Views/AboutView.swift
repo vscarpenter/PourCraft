@@ -5,14 +5,15 @@ struct AboutView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                Spacer()
-                    .frame(height: 40)
-
-                // App icon placeholder
+            VStack(spacing: 20) {
                 Image(systemName: "cup.and.saucer.fill")
-                    .font(.system(size: 60))
+                    .font(.system(size: 44))
                     .foregroundStyle(AppColors.accent(for: colorScheme))
+                    .frame(width: 88, height: 88)
+                    .background(
+                        Circle()
+                            .fill(AppColors.surface(for: colorScheme))
+                    )
 
                 VStack(spacing: 4) {
                     Text("PourCraft")
@@ -26,7 +27,13 @@ struct AboutView: View {
 
                 Text("Version 1.0.0")
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.secondaryText(for: colorScheme))
+                    .foregroundStyle(AppColors.primaryText(for: colorScheme))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(AppColors.surface(for: colorScheme))
+                    )
 
                 VStack(alignment: .leading, spacing: 12) {
                     aboutRow(
@@ -47,19 +54,28 @@ struct AboutView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(AppColors.surface(for: colorScheme))
                 )
-
-                Spacer()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(AppColors.background(for: colorScheme), lineWidth: 1)
+                )
+                .shadow(
+                    color: colorScheme == .dark ? .black.opacity(0.2) : .black.opacity(0.05),
+                    radius: 6,
+                    y: 2
+                )
 
                 HStack(spacing: 0) {
                     Text("Crafted by ")
                         .foregroundStyle(AppColors.secondaryText(for: colorScheme))
                     Link("Vinny Carpenter", destination: URL(string: "https://vinny.dev/")!)
-                        .foregroundStyle(AppColors.accent(for: colorScheme))
+                        .foregroundStyle(AppColors.controlTint(for: colorScheme))
                 }
                 .font(AppTypography.caption)
-                .padding(.bottom, 20)
+                .padding(.top, 4)
             }
             .padding(.horizontal, 20)
+            .padding(.vertical, 24)
+            .frame(maxWidth: .infinity)
         }
         .background(AppColors.background(for: colorScheme))
     }

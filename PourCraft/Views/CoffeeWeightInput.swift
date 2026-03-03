@@ -3,20 +3,25 @@ import SwiftUI
 struct CoffeeWeightInput: View {
     @Bindable var brewModel: BrewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         VStack(spacing: 16) {
             // Weight display
-            HStack(alignment: .firstTextBaseline) {
-                Text(brewModel.formattedWeight(brewModel.coffeeWeight))
-                    .font(AppTypography.largeTitle)
-                    .foregroundStyle(AppColors.primaryText(for: colorScheme))
-                    .contentTransition(.numericText())
-                    .animation(.snappy, value: brewModel.coffeeWeight)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    weightValue
+                    Text("grams")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.secondaryText(for: colorScheme))
+                }
 
-                Text("grams")
-                    .font(AppTypography.body)
-                    .foregroundStyle(AppColors.secondaryText(for: colorScheme))
+                VStack(alignment: .leading, spacing: 4) {
+                    weightValue
+                    Text("grams")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.secondaryText(for: colorScheme))
+                }
             }
 
             // Stepper
@@ -27,15 +32,15 @@ struct CoffeeWeightInput: View {
                 step: 1
             )
             .labelsHidden()
-            .tint(AppColors.accent(for: colorScheme))
+            .tint(AppColors.controlTint(for: colorScheme))
 
             // Ratio display
             Text("Ratio: \(brewModel.selectedRoast.ratioLabel)")
                 .font(AppTypography.captionBold)
-                .foregroundStyle(AppColors.accent(for: colorScheme))
+                .foregroundStyle(AppColors.secondaryText(for: colorScheme))
 
             // Water summary
-            HStack(spacing: 24) {
+            LazyVGrid(columns: waterSummaryColumns, spacing: 12) {
                 waterLabel(
                     title: "Total Water",
                     value: brewModel.formattedWeight(brewModel.totalWater)
@@ -58,7 +63,7 @@ struct CoffeeWeightInput: View {
     }
 
     private func waterLabel(title: String, value: String) -> some View {
-        VStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.secondaryText(for: colorScheme))
@@ -67,6 +72,28 @@ struct CoffeeWeightInput: View {
                 .foregroundStyle(AppColors.primaryText(for: colorScheme))
                 .contentTransition(.numericText())
                 .animation(.snappy, value: value)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(AppColors.background(for: colorScheme))
+        )
+    }
+
+    private var weightValue: some View {
+        Text(brewModel.formattedWeight(brewModel.coffeeWeight))
+            .font(AppTypography.largeTitle)
+            .foregroundStyle(AppColors.primaryText(for: colorScheme))
+            .contentTransition(.numericText())
+            .animation(.snappy, value: brewModel.coffeeWeight)
+    }
+
+    private var waterSummaryColumns: [GridItem] {
+        if dynamicTypeSize.isAccessibilitySize {
+            [GridItem(.flexible())]
+        } else {
+            [GridItem(.adaptive(minimum: 96), spacing: 12)]
         }
     }
 }
