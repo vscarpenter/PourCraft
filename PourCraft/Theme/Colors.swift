@@ -49,4 +49,12 @@ enum AppColors {
     static func accent(for colorScheme: ColorScheme) -> Color {
         colorScheme == .dark ? burnishedCopper : copperKettle
     }
+
+    static func controlTint(for colorScheme: ColorScheme) -> Color {
+        colorScheme == .dark ? hazelnut : roastedBean
+    }
+
+    static func onAccent(for _: ColorScheme) -> Color {
+        nightBrew
+    }
 }
