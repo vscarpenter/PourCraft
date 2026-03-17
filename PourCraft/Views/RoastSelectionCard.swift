@@ -25,7 +25,7 @@ struct RoastSelectionCard: View {
                 Text(roast.flavorProfile)
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.secondaryText(for: colorScheme))
-                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(16)
             .background(
