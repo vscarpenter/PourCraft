@@ -6,12 +6,8 @@ struct TipsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Pro Tips")
-                    .font(AppTypography.largeTitle)
-                    .foregroundStyle(AppColors.primaryText(for: colorScheme))
-
                 Text("Tap any tip to learn more")
-                    .font(AppTypography.caption)
+                    .font(AppTypography.body)
                     .foregroundStyle(AppColors.secondaryText(for: colorScheme))
 
                 ForEach(BrewTip.allTips) { tip in

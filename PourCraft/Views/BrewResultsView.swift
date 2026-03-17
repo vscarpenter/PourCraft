@@ -3,6 +3,7 @@ import SwiftUI
 struct BrewResultsView: View {
     let brewModel: BrewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -12,7 +13,7 @@ struct BrewResultsView: View {
                 .foregroundStyle(AppColors.primaryText(for: colorScheme))
 
             // Summary cards
-            HStack(spacing: 12) {
+            LazyVGrid(columns: summaryColumns, spacing: 12) {
                 summaryCard(
                     label: "Water",
                     value: "\(brewModel.formattedWeight(brewModel.totalWater))g"
@@ -54,9 +55,9 @@ struct BrewResultsView: View {
     private func brewStepRow(number: Int, text: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Text("\(number)")
-                .font(AppTypography.captionBold)
-                .foregroundStyle(.white)
-                .frame(width: 24, height: 24)
+                .font(.footnote.weight(.bold))
+                .foregroundStyle(AppColors.onAccent(for: colorScheme))
+                .frame(width: 26, height: 26)
                 .background(
                     Circle()
                         .fill(AppColors.accent(for: colorScheme))
@@ -65,7 +66,21 @@ struct BrewResultsView: View {
             Text(text)
                 .font(AppTypography.body)
                 .foregroundStyle(AppColors.primaryText(for: colorScheme))
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.vertical, 4)
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(AppColors.surface(for: colorScheme))
+        )
+    }
+
+    private var summaryColumns: [GridItem] {
+        if dynamicTypeSize.isAccessibilitySize {
+            [GridItem(.flexible())]
+        } else {
+            [GridItem(.adaptive(minimum: 140), spacing: 12)]
+        }
     }
 }

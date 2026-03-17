@@ -12,7 +12,7 @@ struct TipCard: View {
                     isExpanded.toggle()
                 }
             } label: {
-                HStack {
+                HStack(alignment: .top, spacing: 12) {
                     Image(systemName: tip.iconName)
                         .font(.title3)
                         .foregroundStyle(AppColors.accent(for: colorScheme))
@@ -29,13 +29,17 @@ struct TipCard: View {
                         .foregroundStyle(AppColors.secondaryText(for: colorScheme))
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.plain)
 
             if isExpanded {
+                Divider()
+                    .overlay(AppColors.background(for: colorScheme))
+
                 Text(tip.body)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.secondaryText(for: colorScheme))
+                    .foregroundStyle(AppColors.primaryText(for: colorScheme))
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
@@ -43,6 +47,15 @@ struct TipCard: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(AppColors.surface(for: colorScheme))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(AppColors.background(for: colorScheme), lineWidth: 1)
+        )
+        .shadow(
+            color: colorScheme == .dark ? .black.opacity(0.2) : .black.opacity(0.05),
+            radius: 6,
+            y: 2
         )
     }
 }
