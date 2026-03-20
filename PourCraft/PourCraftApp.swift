@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct PourCraftApp: App {
     @State private var brewModel = BrewModel()
+    @State private var timerModel = BrewTimerModel()
     @AppStorage("selectedRoast") private var savedRoast: String = Roast.medium.rawValue
     @AppStorage("temperatureUnit") private var savedTempUnit: String = TemperatureUnit.fahrenheit.rawValue
     @Environment(\.colorScheme) private var colorScheme
@@ -26,6 +27,24 @@ struct PourCraftApp: App {
                 }
                     .tabItem {
                         Label("Brew", systemImage: "cup.and.saucer")
+                    }
+
+                NavigationStack {
+                    TimerView(brewModel: brewModel, timerModel: timerModel)
+                        .navigationTitle("Timer")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .principal) {
+                                Text("Timer")
+                                    .font(AppTypography.title)
+                                    .foregroundStyle(AppColors.primaryText(for: colorScheme))
+                            }
+                        }
+                        .toolbarBackground(AppColors.background(for: colorScheme), for: .navigationBar)
+                        .toolbarBackground(.visible, for: .navigationBar)
+                }
+                    .tabItem {
+                        Label("Timer", systemImage: "timer")
                     }
 
                 NavigationStack {
