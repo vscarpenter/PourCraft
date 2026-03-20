@@ -26,6 +26,8 @@ targets:
     info:
       path: PourCraft/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen:
           UIImageName: LaunchIcon
           UIColorName: LaunchBackground
