@@ -25,7 +25,7 @@ struct AboutView: View {
                         .foregroundStyle(AppColors.secondaryText(for: colorScheme))
                 }
 
-                Text("Version 1.2.0")
+                Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.primaryText(for: colorScheme))
                     .padding(.horizontal, 10)
