@@ -28,7 +28,7 @@ PourCraft is a native iOS app that helps pour-over coffee enthusiasts calculate 
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/PourCraft.git
+git clone https://github.com/vscarpenter/PourCraft.git
 cd PourCraft
 
 # Generate the Xcode project
@@ -45,12 +45,14 @@ Build and run on an iOS 17+ simulator or device.
 ```bash
 # Build
 xcodebuild -project PourCraft.xcodeproj -scheme PourCraft \
-  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' build
+  -sdk iphonesimulator -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16' build
 
-# Run tests (21 tests across 2 suites)
+# Run tests (82 tests across 6 suites)
 xcodebuild -project PourCraft.xcodeproj -scheme PourCraft \
-  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' test
+  -sdk iphonesimulator -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16' test
 ```
+
+If your machine has a different simulator runtime installed, replace `OS=18.5` and the device name with one from `xcrun simctl list devices available`.
 
 ## Project Structure
 
@@ -68,6 +70,9 @@ PourCraft/
 │   │   ├── RoastSelectionCard.swift
 │   │   ├── CoffeeWeightInput.swift
 │   │   ├── BrewResultsView.swift
+│   │   ├── TimerView.swift     # Guided brew timer tab
+│   │   ├── TimerRingView.swift
+│   │   ├── TimerControlsView.swift
 │   │   ├── TipsView.swift
 │   │   ├── TipCard.swift
 │   │   └── AboutView.swift
@@ -79,7 +84,11 @@ PourCraft/
 │   └── Assets.xcassets/
 └── PourCraftTests/
     ├── RoastTests.swift        # 6 tests
-    └── BrewModelTests.swift    # 15 tests
+    ├── BrewModelTests.swift
+    ├── BrewTimerModelTests.swift
+    ├── BrewTipTests.swift
+    ├── AppColorsTests.swift
+    └── ColorHexTests.swift
 ```
 
 ## Architecture

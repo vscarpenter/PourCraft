@@ -5,6 +5,7 @@ struct TimerRingView: View {
     let elapsedFormatted: String
     let phase: BrewPhase
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         ZStack {
@@ -25,10 +26,12 @@ struct TimerRingView: View {
             // Center content
             VStack(spacing: 4) {
                 Text(elapsedFormatted)
-                    .font(.system(size: 48, weight: .bold, design: .serif))
+                    .font(.system(size: timerFontSize, weight: .bold, design: .serif))
+                    .monospacedDigit()
                     .foregroundStyle(AppColors.primaryText(for: colorScheme))
                     .contentTransition(.numericText())
                     .animation(.snappy, value: elapsedFormatted)
+                    .minimumScaleFactor(0.65)
 
                 Text(phase.displayName)
                     .font(AppTypography.caption)
@@ -36,7 +39,15 @@ struct TimerRingView: View {
                     .textCase(.uppercase)
             }
         }
-        .frame(width: 220, height: 220)
+        .frame(width: ringDiameter, height: ringDiameter)
         .padding(16)
+    }
+
+    private var ringDiameter: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 180 : 220
+    }
+
+    private var timerFontSize: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 40 : 48
     }
 }

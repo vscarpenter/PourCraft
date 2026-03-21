@@ -1,8 +1,21 @@
+import Foundation
 import Testing
 @testable import PourCraft
 
 @Suite("BrewTimerModel")
 struct BrewTimerModelTests {
+    private final class TestClock {
+        var now: Date
+
+        init(now: Date = Date(timeIntervalSinceReferenceDate: 0)) {
+            self.now = now
+        }
+
+        func advance(seconds: Int) {
+            now = now.addingTimeInterval(TimeInterval(seconds))
+        }
+    }
+
     // MARK: - Default State
 
     @Test("Should default to ready phase")
@@ -267,5 +280,52 @@ struct BrewTimerModelTests {
         let postBloom = BrewTimerModel.targetBrewSeconds - BrewTimerModel.bloomDurationSeconds
         let expected = BrewTimerModel.bloomDurationSeconds + Int(Double(postBloom) * 0.6)
         #expect(model.pourEndSeconds == expected)
+    }
+
+    // MARK: - Wall Clock Sync
+
+    @Test("Should reconcile elapsed time from wall clock")
+    func shouldReconcileElapsedTimeFromWallClock() {
+        let clock = TestClock()
+        let model = BrewTimerModel(nowProvider: { clock.now })
+
+        model.start()
+        clock.advance(seconds: 45)
+        model.syncToNow()
+
+        #expect(model.elapsedSeconds == 45)
+        #expect(model.phase == .pour)
+    }
+
+    @Test("Should ignore paused time when reconciling elapsed time")
+    func shouldIgnorePausedTimeWhenReconcilingElapsedTime() {
+        let clock = TestClock()
+        let model = BrewTimerModel(nowProvider: { clock.now })
+
+        model.start()
+        clock.advance(seconds: 20)
+        model.togglePause()
+
+        clock.advance(seconds: 15)
+        model.togglePause()
+        clock.advance(seconds: 10)
+        model.syncToNow()
+
+        #expect(model.elapsedSeconds == 30)
+        #expect(model.phase == .pour)
+    }
+
+    @Test("Should complete brew after long inactive interval")
+    func shouldCompleteBrewAfterLongInactiveInterval() {
+        let clock = TestClock()
+        let model = BrewTimerModel(nowProvider: { clock.now })
+
+        model.start()
+        clock.advance(seconds: BrewTimerModel.targetBrewSeconds)
+        model.syncToNow()
+
+        #expect(model.phase == .done)
+        #expect(!model.isRunning)
+        #expect(model.elapsedSeconds == BrewTimerModel.targetBrewSeconds)
     }
 }

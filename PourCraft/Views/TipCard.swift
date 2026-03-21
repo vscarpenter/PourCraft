@@ -32,6 +32,8 @@ struct TipCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.plain)
+            .accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
+            .accessibilityHint(isExpanded ? "Double-tap to collapse details" : "Double-tap to expand details")
 
             if isExpanded {
                 Divider()
