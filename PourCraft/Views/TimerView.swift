@@ -4,6 +4,8 @@ struct TimerView: View {
     let brewModel: BrewModel
     @Bindable var timerModel: BrewTimerModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ScrollView {
@@ -44,7 +46,11 @@ struct TimerView: View {
                 }
 
                 // Controls
-                TimerControlsView(timerModel: timerModel)
+                TimerControlsView(
+                    timerModel: timerModel,
+                    onReset: handleReset,
+                    onPrimaryAction: handlePrimaryAction
+                )
 
                 Spacer(minLength: 20)
             }
@@ -52,7 +58,8 @@ struct TimerView: View {
         }
         .background(AppColors.background(for: colorScheme))
         .onAppear {
-            syncBrewParameters()
+            syncIfReady()
+            timerModel.syncToNow()
         }
         .onChange(of: brewModel.coffeeWeight) { _, _ in
             syncIfReady()
@@ -60,12 +67,15 @@ struct TimerView: View {
         .onChange(of: brewModel.selectedRoast) { _, _ in
             syncIfReady()
         }
+        .onChange(of: scenePhase) { _, _ in
+            timerModel.syncToNow()
+        }
     }
 
     // MARK: - Brew Summary Card
 
     private var brewSummaryCard: some View {
-        HStack(spacing: 16) {
+        LazyVGrid(columns: summaryColumns, spacing: 12) {
             summaryItem(label: "Roast", value: brewModel.selectedRoast.displayName)
             summaryItem(label: "Coffee", value: "\(brewModel.formattedWeight(brewModel.coffeeWeight))g")
             summaryItem(label: "Water", value: "\(brewModel.formattedWeight(brewModel.totalWater))g")
@@ -86,8 +96,15 @@ struct TimerView: View {
             Text(value)
                 .font(AppTypography.headline)
                 .foregroundStyle(AppColors.primaryText(for: colorScheme))
+                .multilineTextAlignment(dynamicTypeSize.isAccessibilitySize ? .leading : .center)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .center)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(AppColors.background(for: colorScheme))
+        )
     }
 
     // MARK: - Sync
@@ -103,5 +120,27 @@ struct TimerView: View {
     private func syncIfReady() {
         guard timerModel.phase == .ready else { return }
         syncBrewParameters()
+    }
+
+    private func handlePrimaryAction() {
+        if timerModel.phase == .ready {
+            syncBrewParameters()
+            timerModel.start()
+        } else {
+            timerModel.togglePause()
+        }
+    }
+
+    private func handleReset() {
+        timerModel.reset()
+        syncBrewParameters()
+    }
+
+    private var summaryColumns: [GridItem] {
+        if dynamicTypeSize.isAccessibilitySize {
+            [GridItem(.flexible())]
+        } else {
+            Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
+        }
     }
 }

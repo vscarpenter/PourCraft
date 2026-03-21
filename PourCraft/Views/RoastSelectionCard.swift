@@ -5,6 +5,7 @@ struct RoastSelectionCard: View {
     let isSelected: Bool
     let onSelect: () -> Void
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         Button(action: onSelect) {
@@ -22,7 +23,8 @@ struct RoastSelectionCard: View {
                         Text(roast.flavorProfile)
                             .font(AppTypography.body)
                             .foregroundStyle(AppColors.secondaryText(for: colorScheme))
-                            .lineLimit(2)
+                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
 
                     Spacer()

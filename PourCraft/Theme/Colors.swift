@@ -51,7 +51,7 @@ enum AppColors {
     }
 
     static func controlTint(for colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? hazelnut : roastedBean
+        colorScheme == .dark ? burnishedCopper : roastedBean
     }
 
     static func onAccent(for _: ColorScheme) -> Color {

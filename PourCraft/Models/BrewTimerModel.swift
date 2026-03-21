@@ -63,7 +63,14 @@ final class BrewTimerModel {
     private var _isRunning: Bool = false
     var isRunning: Bool { _isRunning }
 
+    private let nowProvider: () -> Date
     private var timer: Timer?
+    private var elapsedBeforeActiveRunSeconds = 0
+    private var activeRunStartedAt: Date?
+
+    init(nowProvider: @escaping () -> Date = Date.init) {
+        self.nowProvider = nowProvider
+    }
 
     // MARK: - Computed Properties
 
@@ -116,6 +123,9 @@ final class BrewTimerModel {
 
     func start() {
         guard phase == .ready else { return }
+        _elapsedSeconds = 0
+        elapsedBeforeActiveRunSeconds = 0
+        activeRunStartedAt = nowProvider()
         _phase = .bloom
         _isRunning = true
         startTimer()
@@ -123,11 +133,17 @@ final class BrewTimerModel {
 
     func togglePause() {
         guard phase != .ready, phase != .done else { return }
-        _isRunning.toggle()
         if _isRunning {
-            startTimer()
-        } else {
+            syncToNow()
+            _isRunning = false
+            elapsedBeforeActiveRunSeconds = _elapsedSeconds
+            activeRunStartedAt = nil
             stopTimer()
+        } else {
+            elapsedBeforeActiveRunSeconds = _elapsedSeconds
+            activeRunStartedAt = nowProvider()
+            _isRunning = true
+            startTimer()
         }
     }
 
@@ -136,41 +152,66 @@ final class BrewTimerModel {
         _elapsedSeconds = 0
         _phase = .ready
         _isRunning = false
+        elapsedBeforeActiveRunSeconds = 0
+        activeRunStartedAt = nil
     }
 
     /// Advances the timer by one second. Public for deterministic testing.
     func tick() {
-        _elapsedSeconds += 1
-        updatePhase()
+        advanceElapsed(to: elapsedSeconds + 1, rebaseline: true)
+    }
+
+    /// Reconciles elapsed time against the wall clock.
+    func syncToNow() {
+        guard isRunning, let activeRunStartedAt else { return }
+
+        let elapsedSinceResume = max(0, Int(nowProvider().timeIntervalSince(activeRunStartedAt)))
+        advanceElapsed(to: elapsedBeforeActiveRunSeconds + elapsedSinceResume, rebaseline: false)
     }
 
     // MARK: - Private
 
+    private func advanceElapsed(to newValue: Int, rebaseline: Bool) {
+        _elapsedSeconds = min(Self.targetBrewSeconds, max(0, newValue))
+
+        if rebaseline, isRunning {
+            elapsedBeforeActiveRunSeconds = _elapsedSeconds
+            activeRunStartedAt = nowProvider()
+        }
+
+        updatePhase()
+
+        if !isRunning {
+            elapsedBeforeActiveRunSeconds = _elapsedSeconds
+            activeRunStartedAt = nil
+        }
+    }
+
     private func updatePhase() {
-        switch phase {
-        case .bloom:
-            if elapsedSeconds >= Self.bloomDurationSeconds {
-                _phase = .pour
-            }
-        case .pour:
-            if elapsedSeconds >= pourEndSeconds {
-                _phase = .drawdown
-            }
-        case .drawdown:
-            if elapsedSeconds >= Self.targetBrewSeconds {
-                _phase = .done
-                _isRunning = false
-                stopTimer()
-            }
-        default:
-            break
+        guard phase != .ready else { return }
+
+        if elapsedSeconds >= Self.targetBrewSeconds {
+            _phase = .done
+            _isRunning = false
+            stopTimer()
+        } else if elapsedSeconds >= pourEndSeconds {
+            _phase = .drawdown
+        } else if elapsedSeconds >= Self.bloomDurationSeconds {
+            _phase = .pour
+        } else {
+            _phase = .bloom
         }
     }
 
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.tick()
+        stopTimer()
+
+        let timer = Timer(timeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.syncToNow()
         }
+        timer.tolerance = 0.1
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
     }
 
     private func stopTimer() {
