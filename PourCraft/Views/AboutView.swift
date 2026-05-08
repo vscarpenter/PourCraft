@@ -94,16 +94,16 @@ private struct SettingsSection: View {
                 SettingRow(label: "Display temperature in") {
                     UnitSegmentToggle(brewModel: brewModel)
                 }
-                SettingRow(label: "Haptic feedback") {
-                    Text("On")
-                        .font(AppTypography.serifItalic(15))
-                        .foregroundStyle(AppColors.accent(for: scheme))
-                }
-                SettingRow(label: "Auto-advance brew steps") {
-                    Text("On")
-                        .font(AppTypography.serifItalic(15))
-                        .foregroundStyle(AppColors.accent(for: scheme))
-                }
+                ToggleSettingRow(
+                    label: "Haptic feedback",
+                    accessibilityHint: "Plays a tap on each brew-phase change",
+                    isOn: $brewModel.hapticsEnabled
+                )
+                ToggleSettingRow(
+                    label: "Auto-advance brew steps",
+                    accessibilityHint: "Highlights the step matching the live timer phase",
+                    isOn: $brewModel.autoAdvanceSteps
+                )
             }
         }
     }
@@ -125,6 +125,49 @@ private struct SettingRow<Trailing: View>: View {
             }
             .padding(.vertical, 12)
             .frame(minHeight: 44)
+            Rule(color: AppColors.rule(for: scheme))
+        }
+    }
+}
+
+/// Tappable row whose trailing label flips between italic copper "On" / muted "Off".
+/// The whole row is the hit target so it matches the 44pt zine row spec.
+private struct ToggleSettingRow: View {
+    let label: String
+    let accessibilityHint: String
+    @Binding var isOn: Bool
+    @Environment(\.colorScheme) private var scheme
+
+    var body: some View {
+        let ink = AppColors.ink(for: scheme)
+        let muted = AppColors.muted(for: scheme)
+        let accent = AppColors.accent(for: scheme)
+
+        VStack(spacing: 0) {
+            Button {
+                isOn.toggle()
+            } label: {
+                HStack {
+                    Text(label)
+                        .font(AppTypography.serif(16))
+                        .foregroundStyle(ink)
+                    Spacer(minLength: 12)
+                    Text(isOn ? "On" : "Off")
+                        .font(AppTypography.serifItalic(15))
+                        .foregroundStyle(isOn ? accent : muted)
+                        .contentTransition(.opacity)
+                        .animation(.snappy, value: isOn)
+                }
+                .padding(.vertical, 12)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(label)
+            .accessibilityValue(isOn ? "On" : "Off")
+            .accessibilityHint(accessibilityHint)
+            .accessibilityAddTraits(.isButton)
+
             Rule(color: AppColors.rule(for: scheme))
         }
     }

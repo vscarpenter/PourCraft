@@ -14,6 +14,13 @@ struct BrewModelTests {
         #expect(model.temperatureUnit == .fahrenheit)
     }
 
+    @Test("Should default haptics and auto-advance to enabled")
+    func shouldDefaultBehaviorTogglesOn() {
+        let model = BrewModel()
+        #expect(model.hapticsEnabled == true)
+        #expect(model.autoAdvanceSteps == true)
+    }
+
     // MARK: - Reference Table (from spec)
     // | Roast  | Ratio | 15g  | 20g  | 25g  | 30g  |
     // | Dark   | 1:15  | 225g | 300g | 375g | 450g |
@@ -244,5 +251,28 @@ struct BrewModelTests {
         model.restorePreferences(savedRoast: "light", savedTempUnit: "celsius")
         #expect(model.selectedRoast == .light)
         #expect(model.temperatureUnit == .celsius)
+    }
+
+    @Test("Should restore haptics and auto-advance flags when provided")
+    func shouldRestoreBehaviorToggles() {
+        let model = BrewModel()
+        model.restorePreferences(
+            savedRoast: "medium",
+            savedTempUnit: "fahrenheit",
+            savedHapticsEnabled: false,
+            savedAutoAdvanceSteps: false
+        )
+        #expect(model.hapticsEnabled == false)
+        #expect(model.autoAdvanceSteps == false)
+    }
+
+    @Test("Should default haptics and auto-advance to true when restore omits them")
+    func shouldDefaultBehaviorTogglesWhenRestoreOmitsThem() {
+        let model = BrewModel()
+        model.hapticsEnabled = false
+        model.autoAdvanceSteps = false
+        model.restorePreferences(savedRoast: "medium", savedTempUnit: "fahrenheit")
+        #expect(model.hapticsEnabled == true)
+        #expect(model.autoAdvanceSteps == true)
     }
 }

@@ -21,6 +21,13 @@ final class BrewModel {
 
     var temperatureUnit: TemperatureUnit = .fahrenheit
 
+    /// Plays haptic taps on brew-phase transitions when true. Surfaced in About → Settings.
+    var hapticsEnabled: Bool = true
+
+    /// When true, the Guide highlights the step matching the timer's current phase.
+    /// When false, only manually tapped steps expand. Surfaced in About → Settings.
+    var autoAdvanceSteps: Bool = true
+
     // MARK: - Computed Properties
 
     var totalWater: Double {
@@ -56,7 +63,12 @@ final class BrewModel {
 
     /// Restores preferences from raw stored values.
     /// Invalid or unrecognized values are silently ignored, keeping current defaults.
-    func restorePreferences(savedRoast: String, savedTempUnit: String) {
+    func restorePreferences(
+        savedRoast: String,
+        savedTempUnit: String,
+        savedHapticsEnabled: Bool = true,
+        savedAutoAdvanceSteps: Bool = true
+    ) {
         if let roast = Roast(rawValue: savedRoast) {
             selectedRoast = roast
         } else if !savedRoast.isEmpty {
@@ -68,6 +80,9 @@ final class BrewModel {
         } else if !savedTempUnit.isEmpty {
             Self.logger.warning("Ignored unrecognized saved temperature unit: \(savedTempUnit, privacy: .public)")
         }
+
+        hapticsEnabled = savedHapticsEnabled
+        autoAdvanceSteps = savedAutoAdvanceSteps
     }
 
     // MARK: - Helpers

@@ -8,6 +8,8 @@ struct PourCraftApp: App {
 
     @AppStorage("selectedRoast") private var savedRoast: String = Roast.medium.rawValue
     @AppStorage("temperatureUnit") private var savedTempUnit: String = TemperatureUnit.fahrenheit.rawValue
+    @AppStorage("hapticsEnabled") private var savedHapticsEnabled: Bool = true
+    @AppStorage("autoAdvanceSteps") private var savedAutoAdvanceSteps: Bool = true
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -24,13 +26,24 @@ struct PourCraftApp: App {
             }
             .preferredColorScheme(nil) // honor system; explicit for clarity
             .onAppear {
-                brewModel.restorePreferences(savedRoast: savedRoast, savedTempUnit: savedTempUnit)
+                brewModel.restorePreferences(
+                    savedRoast: savedRoast,
+                    savedTempUnit: savedTempUnit,
+                    savedHapticsEnabled: savedHapticsEnabled,
+                    savedAutoAdvanceSteps: savedAutoAdvanceSteps
+                )
             }
             .onChange(of: brewModel.selectedRoast) { _, newValue in
                 savedRoast = newValue.rawValue
             }
             .onChange(of: brewModel.temperatureUnit) { _, newValue in
                 savedTempUnit = newValue.rawValue
+            }
+            .onChange(of: brewModel.hapticsEnabled) { _, newValue in
+                savedHapticsEnabled = newValue
+            }
+            .onChange(of: brewModel.autoAdvanceSteps) { _, newValue in
+                savedAutoAdvanceSteps = newValue
             }
         }
     }
