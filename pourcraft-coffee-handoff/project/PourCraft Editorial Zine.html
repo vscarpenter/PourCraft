@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PourCraft — Editorial Zine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap"/>
+  <style>
+    html, body { margin: 0; padding: 0; background: #E8E1D4; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .pc-frame ::-webkit-scrollbar { width: 0; height: 0; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="shared.jsx"></script>
+  <script type="text/babel" src="zineSystem.jsx"></script>
+  <script type="text/babel" src="screenCalculator.jsx"></script>
+  <script type="text/babel" src="screenGuide.jsx"></script>
+  <script type="text/babel" src="screenTips.jsx"></script>
+  <script type="text/babel" src="screenTipDetail.jsx"></script>
+  <script type="text/babel" src="screenAbout.jsx"></script>
+  <script type="text/babel" src="prototype.jsx"></script>
+  <script type="text/babel" src="motionNote.jsx"></script>
+
+  <script type="text/babel" data-presets="env,react">
+    const PHONE_W = 390, PHONE_H = 844;
+    const FRAME_W = 412, FRAME_H = 866;
+
+    function Phone({ children }) {
+      return (
+        <div className="pc-frame" style={{
+          width: FRAME_W, height: FRAME_H,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>{children}</div>
+      );
+    }
+
+    function Intro() {
+      return (
+        <div style={{ width: 540, padding: '40px 36px',
+          fontFamily: '"Fraunces", Georgia, serif',
+          color: '#2A1F1B' }}>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
+            letterSpacing: 3, textTransform: 'uppercase', color: '#7A5E45' }}>
+            Direction A · Editorial Zine — expanded
+          </div>
+          <h1 style={{ fontSize: 56, fontWeight: 500, lineHeight: 1.0,
+            letterSpacing: -2, margin: '14px 0 0' }}>
+            Pourcraft, set in <em style={{ color: '#B87333' }}>type</em>.
+          </h1>
+          <p style={{ fontSize: 16, lineHeight: 1.55, color: '#5A4636',
+            marginTop: 18, fontFamily: 'Inter, sans-serif' }}>
+            The full app in the Editorial Zine direction. Five screens, each
+            in light and dark, plus a working interactive prototype and a
+            motion language proposal.
+          </p>
+          <div style={{ marginTop: 22, fontFamily: 'Inter, sans-serif',
+            fontSize: 13, lineHeight: 1.6, color: '#3B2F2F',
+            paddingLeft: 0 }}>
+            <strong>What's here</strong>
+            <ul style={{ margin: '8px 0 0', paddingLeft: 18 }}>
+              <li><strong>Brew</strong> — Calculator. Magazine masthead, three numbered sections.</li>
+              <li><strong>Guide</strong> — Eight steps with measurements drawn from the dose you set.</li>
+              <li><strong>Tips</strong> — Eight field-note entries laid out as a TOC.</li>
+              <li><strong>Tip detail</strong> — Drop-cap article with pull quote and references.</li>
+              <li><strong>About</strong> — Colophon page with masthead credits and prefs.</li>
+              <li><strong>Prototype</strong> — All wired together; tap the tab bar.</li>
+              <li><strong>Motion</strong> — Tokens and the six key transitions.</li>
+            </ul>
+          </div>
+          <div style={{ marginTop: 24, padding: '14px 16px',
+            borderLeft: '3px solid #B87333', background: '#F5EAD6',
+            fontFamily: 'Inter, sans-serif', fontSize: 13,
+            lineHeight: 1.55, color: '#3B2F2F' }}>
+            <strong>System carry-over</strong> from Direction A: Fraunces +
+            Inter, copper #B87333, ruled 2px+1px headers, "Nº" section
+            markers, hand-drawn ink iconography, no texture.
+          </div>
+          <div style={{ marginTop: 22, fontFamily: 'Inter, sans-serif',
+            fontSize: 12, color: '#7A5E45', lineHeight: 1.55 }}>
+            <strong>Try the prototype →</strong> the bottom tab bar in any
+            phone navigates between Brew, Guide, Tips, About. The Calculator
+            updates everything; tap "Begin the brew" to land on the Guide
+            with your dose carried over. Tap any tip to open its article.
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <DesignCanvas>
+          <DCSection id="intro" title="Brief"
+            subtitle="Editorial Zine — full app expansion + interactive prototype">
+            <DCArtboard id="brief" label="Overview" width={540} height={FRAME_H}>
+              <Intro/>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="proto"
+            title="Interactive prototype"
+            subtitle="All five screens wired with shared state — tap the tab bar, change the dose, open a tip">
+            <DCArtboard id="proto-light" label="Light · interactive" width={FRAME_W} height={FRAME_H}>
+              <Phone><PourCraftPrototype dark={false}/></Phone>
+            </DCArtboard>
+            <DCArtboard id="proto-dark" label="Dark · interactive" width={FRAME_W} height={FRAME_H}>
+              <Phone><PourCraftPrototype dark={true}/></Phone>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="brew" title="Brew · Calculator"
+            subtitle="Three numbered sections: roast, dose, the pour. Stepper + horizontal ruler.">
+            <DCArtboard id="brew-light" label="Light" width={FRAME_W} height={FRAME_H}>
+              <Phone><CalculatorScreen dark={false}/></Phone>
+            </DCArtboard>
+            <DCArtboard id="brew-dark" label="Dark" width={FRAME_W} height={FRAME_H}>
+              <Phone><CalculatorScreen dark={true}/></Phone>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="guide" title="Guide · The Method"
+            subtitle="Eight steps in order, each tappable to expand. Recipe summary at the top.">
+            <DCArtboard id="guide-light" label="Light" width={FRAME_W} height={FRAME_H}>
+              <Phone><GuideScreen dark={false}/></Phone>
+            </DCArtboard>
+            <DCArtboard id="guide-dark" label="Dark" width={FRAME_W} height={FRAME_H}>
+              <Phone><GuideScreen dark={true}/></Phone>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="tips" title="Tips · Field Notes"
+            subtitle="Magazine table of contents. Eight entries with category, title, dek.">
+            <DCArtboard id="tips-light" label="Light" width={FRAME_W} height={FRAME_H}>
+              <Phone><TipsScreen dark={false}/></Phone>
+            </DCArtboard>
+            <DCArtboard id="tips-dark" label="Dark" width={FRAME_W} height={FRAME_H}>
+              <Phone><TipsScreen dark={true}/></Phone>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="tipDetail" title="Tip · Article view"
+            subtitle="Big numeral hero, drop cap, pull quote, by-the-numbers spec block.">
+            <DCArtboard id="tipDetail-light" label="Light · Nº 01 · Grind" width={FRAME_W} height={FRAME_H}>
+              <Phone><TipDetailScreen dark={false} tipId="grind"/></Phone>
+            </DCArtboard>
+            <DCArtboard id="tipDetail-dark" label="Dark · Nº 03 · Bloom" width={FRAME_W} height={FRAME_H}>
+              <Phone><TipDetailScreen dark={true} tipId="bloom"/></Phone>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="about" title="About · Colophon"
+            subtitle="Masthead credits, by-the-numbers, preferences. Back-of-book feel.">
+            <DCArtboard id="about-light" label="Light" width={FRAME_W} height={FRAME_H}>
+              <Phone><AboutScreen dark={false}/></Phone>
+            </DCArtboard>
+            <DCArtboard id="about-dark" label="Dark" width={FRAME_W} height={FRAME_H}>
+              <Phone><AboutScreen dark={true}/></Phone>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="motion" title="Motion language"
+            subtitle="Tokens for duration + easing, and the six transitions that matter most">
+            <DCArtboard id="motion-note" label="Motion note" width={540} height={FRAME_H}>
+              <MotionNote/>
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

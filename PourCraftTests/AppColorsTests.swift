@@ -40,24 +40,39 @@ struct AppColorsTests {
     func shouldReturnDifferentColorsForLightVsDark() {
         assertDifferentForLightAndDark(AppColors.background, name: "background")
         assertDifferentForLightAndDark(AppColors.surface, name: "surface")
-        assertDifferentForLightAndDark(AppColors.primaryText, name: "primaryText")
-        assertDifferentForLightAndDark(AppColors.secondaryText, name: "secondaryText")
+        assertDifferentForLightAndDark(AppColors.surface2, name: "surface2")
+        assertDifferentForLightAndDark(AppColors.ink, name: "ink")
+        assertDifferentForLightAndDark(AppColors.muted, name: "muted")
         assertDifferentForLightAndDark(AppColors.accent, name: "accent")
     }
 
-    // MARK: - Light Mode Values Match Design System
+    // MARK: - Mapped values match palette tokens
 
-    @Test("Should use cream canvas for light mode background")
-    func shouldUseCreamCanvasForLightBackground() {
-        let background = AppColors.background(for: .light)
-        let expected = AppColors.creamCanvas
-        #expect(!colorsAreDifferent(background, expected))
+    @Test("Should map light mode background to the cream paper token")
+    func shouldUseLightBackgroundToken() {
+        #expect(!colorsAreDifferent(AppColors.background(for: .light), AppColors.lightBackground))
     }
 
-    @Test("Should use night brew for dark mode background")
-    func shouldUseNightBrewForDarkBackground() {
-        let background = AppColors.background(for: .dark)
-        let expected = AppColors.nightBrew
-        #expect(!colorsAreDifferent(background, expected))
+    @Test("Should map dark mode background to the dark paper token")
+    func shouldUseDarkBackgroundToken() {
+        #expect(!colorsAreDifferent(AppColors.background(for: .dark), AppColors.darkBackground))
+    }
+
+    @Test("Should map accent to copper in light and burnished copper in dark")
+    func shouldUseExpectedAccentTokens() {
+        #expect(!colorsAreDifferent(AppColors.accent(for: .light), AppColors.lightAccent))
+        #expect(!colorsAreDifferent(AppColors.accent(for: .dark), AppColors.darkAccent))
+    }
+
+    @Test("Should derive rule color from ink at low opacity")
+    func shouldDeriveRuleFromInk() {
+        // Both should be defined and non-zero alpha; the helper just opacities ink.
+        let lightRule = AppColors.rule(for: .light)
+        let darkRule = AppColors.rule(for: .dark)
+        var alpha: CGFloat = 0
+        UIColor(lightRule).getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        #expect(alpha > 0 && alpha < 1)
+        UIColor(darkRule).getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        #expect(alpha > 0 && alpha < 1)
     }
 }

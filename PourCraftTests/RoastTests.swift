@@ -50,4 +50,12 @@ struct RoastTests {
         #expect(Roast.medium.displayName == "Medium")
         #expect(Roast.dark.displayName == "Dark")
     }
+
+    @Test("Should have non-empty short descriptor for each roast")
+    func shouldHaveShortDescriptors() {
+        for roast in Roast.allCases {
+            #expect(!roast.shortDescriptor.isEmpty)
+            #expect(roast.shortDescriptor.contains("·"))
+        }
+    }
 }
