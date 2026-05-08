@@ -139,24 +139,22 @@ struct BrewModelTests {
         #expect(model.temperatureRange.contains("C"))
     }
 
-    // MARK: - Brew Steps
+    // MARK: - Temperature Point
 
-    @Test("Should contain exactly 8 brew steps")
-    func shouldContainEightBrewSteps() {
+    @Test("Should report fahrenheit point as 200° F")
+    func shouldReportFahrenheitPoint() {
         let model = BrewModel()
-        #expect(model.brewSteps.count == 8)
+        model.temperatureUnit = .fahrenheit
+        #expect(model.temperaturePoint.contains("200"))
+        #expect(model.temperaturePoint.contains("F"))
     }
 
-    @Test("Should include dynamic weight values in brew steps")
-    func shouldIncludeDynamicWeightsInSteps() {
+    @Test("Should report celsius point as 93° C")
+    func shouldReportCelsiusPoint() {
         let model = BrewModel()
-        model.coffeeWeight = 25
-        model.selectedRoast = .medium
-        // Total: 400g, Bloom: 50g, Remaining: 350g
-        let steps = model.brewSteps
-        #expect(steps[2].contains("25g"))   // coffee weight
-        #expect(steps[3].contains("50g"))   // bloom water
-        #expect(steps[5].contains("350g"))  // remaining water
+        model.temperatureUnit = .celsius
+        #expect(model.temperaturePoint.contains("93"))
+        #expect(model.temperaturePoint.contains("C"))
     }
 
     // MARK: - Weight Formatting

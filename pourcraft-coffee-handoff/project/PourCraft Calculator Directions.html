@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PourCraft — Calculator Directions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
+  <style>
+    html, body { margin: 0; padding: 0; background: #E8E1D4; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    /* hide scrollbars inside phone frames */
+    .pc-frame ::-webkit-scrollbar { width: 0; height: 0; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="shared.jsx"></script>
+  <script type="text/babel" src="directionA.jsx"></script>
+  <script type="text/babel" src="directionB.jsx"></script>
+  <script type="text/babel" src="directionC.jsx"></script>
+
+  <script type="text/babel" data-presets="env,react">
+    const { useState } = React;
+
+    const PHONE_W = 390;
+    const PHONE_H = 844;
+    const FRAME_W = 412;   // a little padding around the phone
+    const FRAME_H = 866;
+
+    function Phone({ children }) {
+      // wraps phone with a small padding so its bezel shadow doesn't clip
+      return (
+        <div className="pc-frame" style={{
+          width: FRAME_W, height: FRAME_H,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'transparent',
+        }}>{children}</div>
+      );
+    }
+
+    function Intro() {
+      return (
+        <div style={{ width: 540, padding: '40px 36px',
+          fontFamily: '"Fraunces", Georgia, serif',
+          color: '#2A1F1B' }}>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
+            letterSpacing: 3, textTransform: 'uppercase', color: '#7A5E45' }}>
+            PourCraft · Visual refresh
+          </div>
+          <h1 style={{ fontSize: 56, fontWeight: 500, lineHeight: 1.0,
+            letterSpacing: -2, margin: '14px 0 0' }}>
+            Three takes on the <em style={{ color: '#B87333' }}>Calculator</em>.
+          </h1>
+          <p style={{ fontSize: 16, lineHeight: 1.55, color: '#5A4636',
+            marginTop: 18, fontFamily: 'Inter, sans-serif' }}>
+            Each direction keeps the existing logic intact — roast ratios,
+            bloom math, F/C toggle, two-tap flow — but proposes a different
+            visual personality, accent, and input pattern. All shown in
+            light + dark.
+          </p>
+
+          <div style={{ marginTop: 28, fontFamily: 'Inter, sans-serif',
+            fontSize: 13, lineHeight: 1.7, color: '#3B2F2F' }}>
+            <Row n="A" name="Editorial Zine" accent="#B87333"
+              note="Magazine masthead, numbered sections, ruled lines, big serif numerals. Stepper + horizontal ruler."/>
+            <Row n="B" name="Cafe Menu Board" accent="#C8553D"
+              note="Dotted leaders, banner headers, classified-ad rhythm. Vertical scale slider as the dial."/>
+            <Row n="C" name="Specialty Roaster Bag" accent="#A86B2F"
+              note="Packaging-inspired card with batch stamp, intensity dots, spec back-label. Stepper + presets."/>
+          </div>
+
+          <div style={{ marginTop: 28, padding: '14px 16px', borderLeft: '3px solid #B87333',
+            background: '#F5EAD6', fontFamily: 'Inter, sans-serif', fontSize: 13,
+            lineHeight: 1.55, color: '#3B2F2F' }}>
+            <strong>Type system:</strong> Fraunces (humanist serif) for display,
+            Inter for UI. <strong>Texture:</strong> none — clean and crisp.
+            <strong> Iconography:</strong> hand-drawn ink line set
+            (V60, kettle, scale, bloom, spiral, thermometer).
+          </div>
+
+          <div style={{ marginTop: 22, fontFamily: 'Inter, sans-serif',
+            fontSize: 12, color: '#7A5E45' }}>
+            Pick a direction and I'll expand it across Brew Guide, Pro Tips,
+            Tip Detail, and About — plus a motion language for the bloom
+            timer and step transitions, and a working interactive
+            prototype of the Calculator.
+          </div>
+        </div>
+      );
+    }
+
+    function Row({ n, name, accent, note }) {
+      return (
+        <div style={{ display: 'flex', gap: 12, padding: '10px 0',
+          borderTop: '1px solid rgba(42,31,27,0.15)' }}>
+          <div style={{ width: 24, height: 24, borderRadius: 99,
+            background: accent, color: '#FFF8EC',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: '"Fraunces", serif', fontSize: 14, fontWeight: 600,
+            flexShrink: 0 }}>{n}</div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 14, color: '#2A1F1B' }}>{name}</div>
+            <div style={{ fontSize: 13, color: '#5A4636', marginTop: 2 }}>{note}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <DesignCanvas>
+          <DCSection id="intro" title="Brief" subtitle="PourCraft visual refresh — three calculator directions">
+            <DCArtboard id="brief" label="Overview" width={540} height={FRAME_H}>
+              <Intro/>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="dirA" title="A · Editorial Zine" subtitle="Copper #B87333 — magazine masthead, ruled lines, numbered sections">
+            <DCArtboard id="A-light" label="Light" width={FRAME_W} height={FRAME_H}>
+              <Phone><DirA dark={false}/></Phone>
+            </DCArtboard>
+            <DCArtboard id="A-dark" label="Dark" width={FRAME_W} height={FRAME_H}>
+              <Phone><DirA dark={true}/></Phone>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="dirB" title="B · Cafe Menu Board" subtitle="Terracotta #C8553D — dotted leaders, banner heads, vertical scale slider">
+            <DCArtboard id="B-light" label="Light" width={FRAME_W} height={FRAME_H}>
+              <Phone><DirB dark={false}/></Phone>
+            </DCArtboard>
+            <DCArtboard id="B-dark" label="Dark" width={FRAME_W} height={FRAME_H}>
+              <Phone><DirB dark={true}/></Phone>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="dirC" title="C · Specialty Roaster Bag" subtitle="Copper on deeper cream #A86B2F — packaging-inspired, batch stamp, spec back-label">
+            <DCArtboard id="C-light" label="Light" width={FRAME_W} height={FRAME_H}>
+              <Phone><DirC dark={false}/></Phone>
+            </DCArtboard>
+            <DCArtboard id="C-dark" label="Dark" width={FRAME_W} height={FRAME_H}>
+              <Phone><DirC dark={true}/></Phone>
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

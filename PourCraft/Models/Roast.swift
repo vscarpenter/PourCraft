@@ -28,22 +28,24 @@ enum Roast: String, CaseIterable, Codable, Identifiable {
         "1:\(ratio)"
     }
 
+    /// Long-form descriptor used in cards and bodies.
     var flavorProfile: String {
         switch self {
         case .light:
-            "Bright, floral, tea-like notes. Origin flavors shine through."
+            "Bright, floral, tea-like. Origin flavors shine through."
         case .medium:
-            "Balanced sweetness, clean body. The specialty coffee sweet spot."
+            "Balanced sweetness, clean body. The specialty sweet spot."
         case .dark:
             "Bold, rich, full-bodied. Chocolate and caramel forward."
         }
     }
 
-    var color: Color {
+    /// Two-word kicker used inline next to the roast name.
+    var shortDescriptor: String {
         switch self {
-        case .light: AppColors.morningGold
-        case .medium: AppColors.hazelnut
-        case .dark: AppColors.darkWalnut
+        case .light: "Bright · Floral"
+        case .medium: "Balanced · Sweet"
+        case .dark: "Bold · Rich"
         }
     }
 }
