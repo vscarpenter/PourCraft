@@ -50,6 +50,14 @@ struct GuideView: View {
             }
         }
         .background(AppColors.background(for: scheme))
+        .sensoryFeedback(trigger: timerModel.phase) { oldValue, newValue in
+            guard brewModel.hapticsEnabled, oldValue != newValue else { return nil }
+            switch newValue {
+            case .bloom, .pour, .drawdown: return .impact(weight: .medium)
+            case .done: return .success
+            case .ready: return nil
+            }
+        }
         .onAppear {
             syncTimerIfReady()
             timerModel.syncToNow()
@@ -302,6 +310,7 @@ private struct StepsSection: View {
         if let manuallyExpanded {
             return manuallyExpanded == step.id
         }
+        guard brewModel.autoAdvanceSteps else { return false }
         return timerActiveStepId == step.id
     }
 

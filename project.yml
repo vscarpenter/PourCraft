@@ -19,8 +19,8 @@ targets:
       base:
         INFOPLIST_FILE: PourCraft/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.pourcraft.app
-        MARKETING_VERSION: "2.0.0"
-        CURRENT_PROJECT_VERSION: "8"
+        MARKETING_VERSION: "2.1.0"
+        CURRENT_PROJECT_VERSION: "9"
         GENERATE_INFOPLIST_FILE: false
         SWIFT_EMIT_LOC_STRINGS: "YES"
     info:
