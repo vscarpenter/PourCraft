@@ -63,11 +63,17 @@ final class BrewModel {
 
     /// Restores preferences from raw stored values.
     /// Invalid or unrecognized values are silently ignored, keeping current defaults.
+    ///
+    /// When a "Save as my morning" preset is present (`savedPresetRoast` non-empty
+    /// and `savedPresetWeight` > 0), it overrides `savedRoast` and applies the
+    /// stored coffee weight — this is the brew the user explicitly pinned.
     func restorePreferences(
         savedRoast: String,
         savedTempUnit: String,
         savedHapticsEnabled: Bool = true,
-        savedAutoAdvanceSteps: Bool = true
+        savedAutoAdvanceSteps: Bool = true,
+        savedPresetRoast: String = "",
+        savedPresetWeight: Double = 0
     ) {
         if let roast = Roast(rawValue: savedRoast) {
             selectedRoast = roast
@@ -83,6 +89,16 @@ final class BrewModel {
 
         hapticsEnabled = savedHapticsEnabled
         autoAdvanceSteps = savedAutoAdvanceSteps
+
+        // Morning preset wins over the generic saved roast when both are valid.
+        if savedPresetWeight > 0 {
+            if let presetRoast = Roast(rawValue: savedPresetRoast) {
+                selectedRoast = presetRoast
+            } else if !savedPresetRoast.isEmpty {
+                Self.logger.warning("Ignored unrecognized saved preset roast: \(savedPresetRoast, privacy: .public)")
+            }
+            coffeeWeight = savedPresetWeight
+        }
     }
 
     // MARK: - Helpers

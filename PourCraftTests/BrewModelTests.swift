@@ -275,4 +275,70 @@ struct BrewModelTests {
         #expect(model.hapticsEnabled == true)
         #expect(model.autoAdvanceSteps == true)
     }
+
+    // MARK: - Morning Preset Restoration
+
+    @Test("Should restore morning preset roast and weight when both are valid")
+    func shouldRestoreMorningPreset() {
+        let model = BrewModel()
+        model.restorePreferences(
+            savedRoast: "medium",
+            savedTempUnit: "fahrenheit",
+            savedPresetRoast: "dark",
+            savedPresetWeight: 25
+        )
+        #expect(model.selectedRoast == .dark)
+        #expect(model.coffeeWeight == 25)
+    }
+
+    @Test("Should let morning preset override generic saved roast")
+    func shouldLetMorningPresetOverrideSavedRoast() {
+        let model = BrewModel()
+        model.restorePreferences(
+            savedRoast: "light",
+            savedTempUnit: "fahrenheit",
+            savedPresetRoast: "dark",
+            savedPresetWeight: 18
+        )
+        #expect(model.selectedRoast == .dark)
+        #expect(model.coffeeWeight == 18)
+    }
+
+    @Test("Should ignore preset when weight is zero (no preset saved)")
+    func shouldIgnoreMorningPresetWhenWeightZero() {
+        let model = BrewModel()
+        model.restorePreferences(
+            savedRoast: "light",
+            savedTempUnit: "fahrenheit",
+            savedPresetRoast: "dark",
+            savedPresetWeight: 0
+        )
+        #expect(model.selectedRoast == .light)
+        #expect(model.coffeeWeight == 20)
+    }
+
+    @Test("Should clamp preset weight that falls outside the valid range")
+    func shouldClampOutOfRangeMorningPresetWeight() {
+        let model = BrewModel()
+        model.restorePreferences(
+            savedRoast: "medium",
+            savedTempUnit: "fahrenheit",
+            savedPresetRoast: "medium",
+            savedPresetWeight: 200
+        )
+        #expect(model.coffeeWeight == 60)
+    }
+
+    @Test("Should keep preset weight when preset roast is invalid")
+    func shouldApplyPresetWeightEvenWhenPresetRoastInvalid() {
+        let model = BrewModel()
+        model.restorePreferences(
+            savedRoast: "light",
+            savedTempUnit: "fahrenheit",
+            savedPresetRoast: "extra-dark",
+            savedPresetWeight: 28
+        )
+        #expect(model.selectedRoast == .light)
+        #expect(model.coffeeWeight == 28)
+    }
 }
