@@ -10,6 +10,8 @@ struct PourCraftApp: App {
     @AppStorage("temperatureUnit") private var savedTempUnit: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("hapticsEnabled") private var savedHapticsEnabled: Bool = true
     @AppStorage("autoAdvanceSteps") private var savedAutoAdvanceSteps: Bool = true
+    @AppStorage("savedPresetRoast") private var savedPresetRoast: String = ""
+    @AppStorage("savedPresetWeight") private var savedPresetWeight: Double = 0
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -30,7 +32,9 @@ struct PourCraftApp: App {
                     savedRoast: savedRoast,
                     savedTempUnit: savedTempUnit,
                     savedHapticsEnabled: savedHapticsEnabled,
-                    savedAutoAdvanceSteps: savedAutoAdvanceSteps
+                    savedAutoAdvanceSteps: savedAutoAdvanceSteps,
+                    savedPresetRoast: savedPresetRoast,
+                    savedPresetWeight: savedPresetWeight
                 )
             }
             .onChange(of: brewModel.selectedRoast) { _, newValue in
