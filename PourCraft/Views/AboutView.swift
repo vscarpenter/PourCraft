@@ -59,7 +59,7 @@ private struct Manifesto: View {
     @Environment(\.colorScheme) private var scheme
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("Pourcraft is a small calculator that takes coffee seriously without taking itself too seriously.")
+            Text("PourCraft is a small calculator that takes coffee seriously without taking itself too seriously.")
                 .font(AppTypography.manifesto)
                 .foregroundStyle(AppColors.ink(for: scheme))
                 .kerning(-0.4)
@@ -224,8 +224,9 @@ private struct ReadingRoomSection: View {
             SectionHeader(number: "02", kicker: "The Reading Room")
 
             VStack(spacing: 0) {
-                ChevronRow(label: "Rate Pourcraft") {
-                    if let url = URL(string: "https://apps.apple.com/us/app/pourcraft-coffee/id6759871953?action=write-review") {
+                ChevronRow(label: "Rate PourCraft") {
+                    let reviewURL = "https://apps.apple.com/us/app/pourcraft-coffee/id6759871953?action=write-review"
+                    if let url = URL(string: reviewURL) {
                         openURL(url)
                     }
                 }
@@ -235,7 +236,7 @@ private struct ReadingRoomSection: View {
                     }
                 }
                 ChevronRow(label: "Send feedback") {
-                    if let url = URL(string: "mailto:pourcraftcoffee@vinny.dev?subject=Pourcraft%20feedback") {
+                    if let url = URL(string: "mailto:pourcraftcoffee@vinny.dev?subject=PourCraft%20feedback") {
                         openURL(url)
                     }
                 }

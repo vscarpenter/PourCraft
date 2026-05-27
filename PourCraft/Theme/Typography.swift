@@ -38,15 +38,15 @@ enum AppTypography {
 
     // MARK: - Display tokens
 
-    static let masthead = serif(56, relativeTo: .title)
-    static let subPageTitle = serif(44, relativeTo: .title)
-    static let sectionTitle = serif(26, weight: .medium, relativeTo: .title2)
+    static let masthead = serif(46, relativeTo: .title)
+    static let subPageTitle = serif(38, relativeTo: .title)
+    static let sectionTitle = serif(21, weight: .medium, relativeTo: .title2)
 
     // MARK: - Editorial body
 
     static let articleBody = serif(16, relativeTo: .body)
-    static let manifesto = serifItalic(22, relativeTo: .title3)
-    static let pullQuote = serifItalic(24, relativeTo: .title3)
+    static let manifesto = serifItalic(21, relativeTo: .title3)
+    static let pullQuote = serifItalic(23, relativeTo: .title3)
 
     // MARK: - UI labels (sans, ~caption2 size, scales with Dynamic Type)
 

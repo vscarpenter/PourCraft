@@ -45,9 +45,9 @@ struct ZineTabBar: View {
                         let active = tab == selection
                         VStack(spacing: 4) {
                             Image(systemName: tab.symbol)
-                                .font(.system(size: 20, weight: .regular))
+                                .font(.system(size: 17, weight: .regular))
                                 .foregroundStyle(active ? accent : muted)
-                                .frame(height: 24)
+                                .frame(height: 20)
                             Text(tab.label)
                                 .font(AppTypography.tabLabel)
                                 .tracking(1)
@@ -62,8 +62,8 @@ struct ZineTabBar: View {
                     .accessibilityAddTraits(tab == selection ? .isSelected : [])
                 }
             }
-            .padding(.top, 10)
-            .padding(.bottom, 4)
+            .padding(.top, 8)
+            .padding(.bottom, 5)
         }
         .background(AppColors.background(for: scheme))
     }

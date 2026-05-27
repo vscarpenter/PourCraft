@@ -2,8 +2,8 @@ import SwiftUI
 
 // MARK: - Rule (horizontal divider)
 
-/// A flat horizontal divider. Pairs of rules (2px + 1px) approximate the
-/// double-rule magazine masthead from the handoff.
+/// A flat horizontal divider. Pairs of rules (2px + 1px) carry the
+/// magazine masthead language without adding boxed chrome.
 struct Rule: View {
     var thickness: CGFloat = 1
     var color: Color
@@ -13,6 +13,28 @@ struct Rule: View {
         Rectangle()
             .fill(color.opacity(opacity))
             .frame(height: thickness)
+    }
+}
+
+// MARK: - Dotted rule (table-of-contents separators)
+
+struct DottedRule: View {
+    var color: Color
+    var opacity: Double = 1
+
+    var body: some View {
+        GeometryReader { geo in
+            let dotCount = max(3, Int(geo.size.width / 7))
+            HStack(spacing: 0) {
+                ForEach(0..<dotCount, id: \.self) { _ in
+                    Circle()
+                        .fill(color.opacity(opacity))
+                        .frame(width: 1.6, height: 1.6)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .frame(height: 2)
     }
 }
 
@@ -29,23 +51,16 @@ struct Masthead<Title: View>: View {
     }
 
     var body: some View {
-        let edition = ZineEdition.current
         let ink = AppColors.ink(for: scheme)
         let muted = AppColors.muted(for: scheme)
-        let accent = AppColors.accent(for: scheme)
 
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text("Vol. \(edition.volume) · Issue \(edition.issue)")
-                Spacer()
-                HStack(spacing: 6) {
-                    InkIconView(icon: .stamp, size: 12, color: accent, strokeWidth: 1.4)
-                    Text("Pourcraft")
-                }
-                Spacer()
-                Text(edition.month)
+                Text("PourCraft")
+                Spacer(minLength: 12)
+                Text("The Brew")
             }
-            .font(AppTypography.kicker)
+            .font(AppTypography.micro)
             .tracking(2.5)
             .textCase(.uppercase)
             .foregroundStyle(muted)
@@ -63,8 +78,8 @@ struct Masthead<Title: View>: View {
             title
                 .font(AppTypography.masthead)
                 .foregroundStyle(ink)
-                .kerning(-2.5)
-                .padding(.top, 20)
+                .kerning(-2)
+                .padding(.top, 14)
                 .padding(.bottom, 4)
 
             HStack {
@@ -80,7 +95,7 @@ struct Masthead<Title: View>: View {
             }
 
             Rule(color: AppColors.rule(for: scheme))
-                .padding(.top, 14)
+                .padding(.top, 10)
         }
         .padding(.horizontal, 24)
         .padding(.top, 4)
@@ -128,7 +143,7 @@ struct SubHeader<Title: View>: View {
                     }
                     .buttonStyle(.plain)
                 } else {
-                    Text("Pourcraft")
+                    Text("PourCraft")
                 }
                 Spacer()
                 Text(kicker)
@@ -175,13 +190,14 @@ struct SectionHeader: View {
         let accent = AppColors.accent(for: scheme)
 
         HStack(alignment: .firstTextBaseline, spacing: 10) {
-            Text("Nº \(number)")
-                .font(AppTypography.serifItalic(13))
+            Text("No. \(number)")
+                .font(AppTypography.micro)
+                .textCase(.uppercase)
                 .foregroundStyle(accent)
-                .tracking(0.4)
+                .tracking(2)
 
             Rectangle()
-                .fill(accent.opacity(0.5))
+                .fill(accent.opacity(0.42))
                 .frame(height: 1)
 
             Text(kicker)
@@ -222,8 +238,8 @@ struct ZineSection<Content: View>: View {
                 .font(AppTypography.sectionTitle)
                 .foregroundStyle(ink)
                 .kerning(-0.5)
-                .padding(.top, 10)
-                .padding(.bottom, 16)
+                .padding(.top, 7)
+                .padding(.bottom, 10)
 
             content
         }
