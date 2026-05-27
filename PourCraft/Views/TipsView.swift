@@ -24,10 +24,10 @@ struct TipsView: View {
 
                     PullQuoteIntro()
                         .padding(.horizontal, 24)
-                        .padding(.top, 20)
+                        .padding(.top, 18)
 
                     ContentsTOC()
-                        .padding(.top, 4)
+                        .padding(.top, 2)
 
                     Color.clear.frame(height: 24)
                 }
@@ -46,7 +46,7 @@ private struct PullQuoteIntro: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text("Most great cups fail on a small detail. These are the small details.")
-                .font(AppTypography.serifItalic(22))
+                .font(AppTypography.serifItalic(20))
                 .foregroundStyle(AppColors.ink(for: scheme))
                 .kerning(-0.4)
                 .lineSpacing(2)
@@ -117,7 +117,7 @@ private struct TipRow: View {
         VStack(spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: 14) {
                 Text(tip.numberLabel)
-                    .font(AppTypography.serif(32, weight: .regular))
+                    .font(AppTypography.serif(30, weight: .regular))
                     .foregroundStyle(accent)
                     .kerning(-1)
                     .frame(width: 38, alignment: .leading)
@@ -149,7 +149,7 @@ private struct TipRow: View {
             .padding(.vertical, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Rule(color: AppColors.rule(for: scheme), opacity: 0.6)
+            DottedRule(color: AppColors.ruleStrong(for: scheme), opacity: 0.34)
         }
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)

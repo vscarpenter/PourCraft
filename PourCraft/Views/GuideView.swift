@@ -86,29 +86,30 @@ private struct RecipeSummaryStrip: View {
     var body: some View {
         let muted = AppColors.muted(for: scheme)
 
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Today's Recipe")
-                    .font(AppTypography.micro)
-                    .tracking(2.5)
-                    .textCase(.uppercase)
-                    .foregroundStyle(muted)
-                Spacer()
-                Text("\(brewModel.selectedRoast.displayName) · \(brewModel.selectedRoast.ratioLabel)")
-                    .font(AppTypography.serifItalic(13))
-                    .foregroundStyle(muted)
-            }
+        VStack(spacing: 0) {
+            Rule(color: AppColors.rule(for: scheme))
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Today's Recipe")
+                        .font(AppTypography.micro)
+                        .tracking(2.5)
+                        .textCase(.uppercase)
+                        .foregroundStyle(muted)
+                    Spacer()
+                    Text("\(brewModel.selectedRoast.displayName) · \(brewModel.selectedRoast.ratioLabel)")
+                        .font(AppTypography.serifItalic(13))
+                        .foregroundStyle(muted)
+                }
 
-            HStack(alignment: .top, spacing: 0) {
-                SummaryCell(key: "Coffee", value: "\(brewModel.formattedWeight(brewModel.coffeeWeight))g")
-                SummaryCell(key: "Water", value: "\(brewModel.formattedWeight(brewModel.totalWater))g")
-                SummaryCell(key: "Temp", value: brewModel.temperaturePoint)
+                HStack(alignment: .top, spacing: 0) {
+                    SummaryCell(key: "Coffee", value: "\(brewModel.formattedWeight(brewModel.coffeeWeight))g")
+                    SummaryCell(key: "Water", value: "\(brewModel.formattedWeight(brewModel.totalWater))g")
+                    SummaryCell(key: "Temp", value: brewModel.temperaturePoint)
+                }
             }
+            .padding(.vertical, 13)
+            Rule(color: AppColors.rule(for: scheme))
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(AppColors.surface(for: scheme))
-        .overlay(Rectangle().stroke(AppColors.rule(for: scheme), lineWidth: 1))
     }
 }
 
@@ -148,67 +149,68 @@ private struct TimerStrip: View {
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
 
-        VStack(spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Live timer")
-                        .font(AppTypography.micro)
-                        .tracking(2.5)
-                        .textCase(.uppercase)
-                        .foregroundStyle(muted)
-                    Text(timerModel.totalElapsedFormatted)
-                        .font(AppTypography.serif(36, weight: .medium))
-                        .foregroundStyle(ink)
-                        .kerning(-1)
-                        .monospacedDigit()
-                        .contentTransition(.numericText())
-                        .animation(.snappy, value: timerModel.elapsedSeconds)
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text(timerModel.phase.displayName)
-                        .font(AppTypography.micro)
-                        .tracking(2.5)
-                        .textCase(.uppercase)
-                        .foregroundStyle(timerModel.phase == .ready ? muted : accent)
-                    Text("of \(timerModel.targetTimeFormatted)")
-                        .font(AppTypography.serifItalic(13))
-                        .foregroundStyle(muted)
-                }
-            }
-
-            // Progress rule
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(AppColors.rule(for: scheme))
-                        .frame(height: 2)
-                    Rectangle()
-                        .fill(accent)
-                        .frame(width: max(0, geo.size.width * timerModel.progress), height: 2)
-                        .animation(.linear(duration: 1), value: timerModel.progress)
-                }
-            }
-            .frame(height: 2)
-
-            HStack(spacing: 12) {
-                if timerModel.phase != .ready {
-                    Button("Reset") {
-                        withAnimation(.snappy) { handleReset() }
+        VStack(spacing: 0) {
+            Rule(color: AppColors.rule(for: scheme))
+            VStack(spacing: 12) {
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Live timer")
+                            .font(AppTypography.micro)
+                            .tracking(2.5)
+                            .textCase(.uppercase)
+                            .foregroundStyle(muted)
+                        Text(timerModel.totalElapsedFormatted)
+                            .font(AppTypography.serif(34, weight: .medium))
+                            .foregroundStyle(ink)
+                            .kerning(-1)
+                            .monospacedDigit()
+                            .contentTransition(.numericText())
+                            .animation(.snappy, value: timerModel.elapsedSeconds)
                     }
-                    .buttonStyle(GhostButtonStyle())
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(timerModel.phase.displayName)
+                            .font(AppTypography.micro)
+                            .tracking(2.5)
+                            .textCase(.uppercase)
+                            .foregroundStyle(timerModel.phase == .ready ? muted : accent)
+                        Text("of \(timerModel.targetTimeFormatted)")
+                            .font(AppTypography.serifItalic(13))
+                            .foregroundStyle(muted)
+                    }
                 }
-                Button(primaryLabel) {
-                    withAnimation(.snappy) { handlePrimary() }
+
+                // Progress rule
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Rectangle()
+                            .fill(AppColors.rule(for: scheme))
+                            .frame(height: 2)
+                        Rectangle()
+                            .fill(accent)
+                            .frame(width: max(0, geo.size.width * timerModel.progress), height: 2)
+                            .animation(.linear(duration: 1), value: timerModel.progress)
+                    }
                 }
-                .buttonStyle(SolidButtonStyle())
-                .disabled(timerModel.phase == .done)
+                .frame(height: 2)
+
+                HStack(spacing: 12) {
+                    if timerModel.phase != .ready {
+                        Button("Reset") {
+                            withAnimation(.snappy) { handleReset() }
+                        }
+                        .buttonStyle(GhostButtonStyle())
+                    }
+                    Button(primaryLabel) {
+                        withAnimation(.snappy) { handlePrimary() }
+                    }
+                    .buttonStyle(SolidButtonStyle())
+                    .disabled(timerModel.phase == .done)
+                }
             }
+            .padding(.vertical, 14)
+            Rule(color: AppColors.rule(for: scheme))
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 16)
-        .background(AppColors.surface(for: scheme))
-        .overlay(Rectangle().stroke(AppColors.rule(for: scheme), lineWidth: 1))
     }
 
     private var primaryLabel: String {
@@ -345,51 +347,59 @@ private struct StepRow: View {
 
         Button(action: onTap) {
             VStack(spacing: 0) {
-                HStack(alignment: .top, spacing: 14) {
-                    // big serif numeral
-                    Text(step.numberLabel)
-                        .font(AppTypography.serif(38, weight: .regular))
-                        .foregroundStyle(active ? accent : ink)
-                        .kerning(-1.5)
-                        .frame(width: 44, alignment: .leading)
-                        .animation(.snappy, value: active)
+                HStack(alignment: .top, spacing: 0) {
+                    Rectangle()
+                        .fill(active ? accent : .clear)
+                        .frame(width: 3)
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 10) {
-                            InkIconView(
-                                icon: step.icon, size: 18,
-                                color: active ? accent : ink, strokeWidth: 1.4
-                            )
-                            Text(step.title)
-                                .font(AppTypography.serif(19, weight: .medium))
-                                .foregroundStyle(ink)
-                                .kerning(-0.3)
-                        }
-                        Text(step.meta)
-                            .font(AppTypography.micro)
-                            .tracking(2)
-                            .textCase(.uppercase)
-                            .foregroundStyle(muted)
-                            .padding(.bottom, 2)
-                        Text(step.body)
-                            .font(AppTypography.serif(14))
-                            .foregroundStyle(ink)
-                            .opacity(active ? 1 : 0.85)
-                            .lineLimit(active ? nil : 1)
-                            .multilineTextAlignment(.leading)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack(alignment: .top, spacing: 14) {
+                        Text(step.numberLabel)
+                            .font(AppTypography.serif(36, weight: .regular))
+                            .foregroundStyle(active ? accent : ink)
+                            .kerning(-1.5)
+                            .frame(width: 44, alignment: .leading)
                             .animation(.snappy, value: active)
-                    }
 
-                    InkIconView(
-                        icon: .chevron, size: 14,
-                        color: muted, strokeWidth: 1.6
-                    )
-                    .rotationEffect(.degrees(active ? 90 : 0))
-                    .padding(.top, 10)
-                    .animation(.snappy, value: active)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 10) {
+                                InkIconView(
+                                    icon: step.icon, size: 18,
+                                    color: active ? accent : ink, strokeWidth: 1.4
+                                )
+                                Text(step.title)
+                                    .font(AppTypography.serif(18, weight: .medium))
+                                    .foregroundStyle(ink)
+                                    .kerning(-0.3)
+                            }
+                            Text(step.meta)
+                                .font(AppTypography.micro)
+                                .tracking(2)
+                                .textCase(.uppercase)
+                                .foregroundStyle(muted)
+                                .padding(.bottom, 2)
+                            Text(step.body)
+                                .font(AppTypography.serif(14))
+                                .foregroundStyle(ink)
+                                .opacity(active ? 1 : 0.85)
+                                .lineLimit(active ? nil : 1)
+                                .multilineTextAlignment(.leading)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .animation(.snappy, value: active)
+                        }
+
+                        InkIconView(
+                            icon: .chevron, size: 14,
+                            color: muted, strokeWidth: 1.6
+                        )
+                        .rotationEffect(.degrees(active ? 90 : 0))
+                        .padding(.top, 10)
+                        .animation(.snappy, value: active)
+                    }
+                    .padding(.leading, 11)
+                    .padding(.vertical, 14)
+                    .padding(.trailing, 0)
                 }
-                .padding(.vertical, 16)
+                .background(active ? AppColors.chip(for: scheme) : .clear)
                 Rule(color: AppColors.rule(for: scheme))
             }
         }

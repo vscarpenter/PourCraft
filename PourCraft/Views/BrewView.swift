@@ -23,20 +23,20 @@ struct BrewView: View {
                 ZineSection(number: "01", title: "Choose your roast.", kicker: "Three options") {
                     RoastList(brewModel: brewModel)
                 }
-                .padding(.top, 22)
+                .padding(.top, 18)
 
                 ZineSection(number: "02", title: "Dial in the dose.", kicker: "Grams") {
                     DoseInput(brewModel: brewModel)
                 }
-                .padding(.top, 28)
+                .padding(.top, 20)
 
                 ZineSection(number: "03", title: "The pour, by weight.", kicker: "Computed") {
                     PourBlock(brewModel: brewModel)
                 }
-                .padding(.top, 28)
+                .padding(.top, 24)
 
                 BeginBrewBlock(brewModel: brewModel, onStartBrew: onStartBrew)
-                    .padding(.top, 28)
+                    .padding(.top, 24)
                     .padding(.horizontal, 24)
 
                 Color.clear.frame(height: 24)
@@ -90,35 +90,32 @@ private struct RoastRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .firstTextBaseline) {
                         Text(roast.displayName)
-                            .font(AppTypography.serif(22, weight: .medium))
+                            .font(AppTypography.serif(18, weight: .medium))
                             .foregroundStyle(ink)
                             .kerning(-0.3)
 
                         Text("\u{2014} \(roast.shortDescriptor)")
-                            .font(AppTypography.serifItalic(13))
+                            .font(AppTypography.serifItalic(11))
                             .foregroundStyle(muted)
 
                         Spacer(minLength: 8)
 
                         Text(roast.ratioLabel)
-                            .font(AppTypography.serifItalic(22, weight: .medium))
-                            .foregroundStyle(selected ? accent : ink)
+                            .font(AppTypography.serifItalic(18, weight: .medium))
+                            .foregroundStyle(accent)
                             .kerning(-0.5)
                     }
 
-                    if selected {
-                        Text(roast.flavorProfile)
-                            .font(AppTypography.sans(.caption))
-                            .foregroundStyle(muted)
-                            .lineSpacing(1.45)
-                            .multilineTextAlignment(.leading)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .transition(.opacity)
-                    }
+                    Text(roast.flavorProfile)
+                        .font(AppTypography.serifItalic(12))
+                        .foregroundStyle(muted)
+                        .lineSpacing(1.2)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.leading, 14)
                 .padding(.trailing, 4)
-                .padding(.vertical, 14)
+                .padding(.vertical, 8)
             }
             .background(selected ? chip : .clear)
         }
@@ -144,9 +141,9 @@ private struct DoseInput: View {
             HStack(alignment: .bottom) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text("\(Int(brewModel.coffeeWeight))")
-                        .font(AppTypography.serif(96, weight: .regular))
+                        .font(AppTypography.serif(76, weight: .regular, relativeTo: .title))
                         .foregroundStyle(ink)
-                        .kerning(-4)
+                        .kerning(-3)
                         .monospacedDigit()
                         .contentTransition(.numericText())
                         .animation(.snappy, value: brewModel.coffeeWeight)
@@ -168,6 +165,7 @@ private struct DoseInput: View {
             }
 
             DoseRuler(value: $brewModel.coffeeWeight)
+                .padding(.top, -2)
 
             HStack {
                 (Text("at a ratio of ")
@@ -220,7 +218,6 @@ private struct DoseRuler: View {
 
     var body: some View {
         let ink = AppColors.ink(for: scheme)
-        let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
 
         GeometryReader { geo in
@@ -240,21 +237,11 @@ private struct DoseRuler: View {
                 }
                 .frame(height: 18, alignment: .top)
 
-                HStack {
-                    ForEach([10, 20, 30, 40, 50, 60], id: \.self) { value in
-                        if value != 10 { Spacer() }
-                        Text("\(value)")
-                            .font(AppTypography.sans(.caption2, weight: .semibold))
-                            .foregroundStyle(muted)
-                    }
-                }
-                .padding(.top, 22)
-
-                Path { p in
-                    p.move(to: CGPoint(x: 0, y: 10))
-                    p.addLine(to: CGPoint(x: 7, y: 0))
-                    p.addLine(to: CGPoint(x: 14, y: 10))
-                    p.closeSubpath()
+                Path { path in
+                    path.move(to: CGPoint(x: 0, y: 10))
+                    path.addLine(to: CGPoint(x: 7, y: 0))
+                    path.addLine(to: CGPoint(x: 14, y: 10))
+                    path.closeSubpath()
                 }
                 .fill(accent)
                 .frame(width: 14, height: 10)
@@ -271,7 +258,7 @@ private struct DoseRuler: View {
                     }
             )
         }
-        .frame(height: 50)
+        .frame(height: 34)
         .accessibilityElement()
         .accessibilityLabel("Coffee dose")
         .accessibilityValue("\(Int(value)) grams")
@@ -328,8 +315,8 @@ private struct PourBlock: View {
                     unit: nil
                 )
             }
-            .padding(.horizontal, 22)
-            .padding(.vertical, 20)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 18)
             .background(AppColors.surface(for: scheme))
             .overlay(
                 Rectangle().stroke(AppColors.rule(for: scheme), lineWidth: 1)
@@ -342,7 +329,7 @@ private struct PourBlock: View {
                 Spacer()
                 TempUnitToggle(brewModel: brewModel)
             }
-            .padding(.top, 16)
+            .padding(.top, 14)
         }
     }
 
