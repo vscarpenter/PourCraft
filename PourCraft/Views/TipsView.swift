@@ -80,7 +80,7 @@ private struct ContentsTOC: View {
             .padding(.vertical, 14)
             .padding(.horizontal, 24)
 
-            VStack(spacing: 0) {
+            VStack(spacing: 8) {
                 ForEach(BrewTip.allTips) { tip in
                     NavigationLink(value: tip) {
                         TipRow(tip: tip)
@@ -114,43 +114,48 @@ private struct TipRow: View {
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
 
-        VStack(spacing: 0) {
-            HStack(alignment: .firstTextBaseline, spacing: 14) {
-                Text(tip.numberLabel)
-                    .font(AppTypography.serif(30, weight: .regular))
-                    .foregroundStyle(accent)
-                    .kerning(-1)
-                    .frame(width: 38, alignment: .leading)
+        HStack(alignment: .firstTextBaseline, spacing: 14) {
+            Text(tip.numberLabel)
+                .font(AppTypography.serif(30, weight: .regular))
+                .foregroundStyle(accent)
+                .kerning(-1)
+                .frame(width: 38, alignment: .leading)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(tip.category)
-                        .font(AppTypography.micro)
-                        .tracking(2.5)
-                        .textCase(.uppercase)
-                        .foregroundStyle(muted)
-                    Text(tip.title)
-                        .font(AppTypography.serif(19, weight: .medium))
-                        .foregroundStyle(ink)
-                        .kerning(-0.3)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(1.15)
-                    Text(tip.dek)
-                        .font(AppTypography.serifItalic(13))
-                        .foregroundStyle(muted)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(1.4)
-                }
-
-                Spacer()
-
-                InkIconView(icon: .chevron, size: 14, color: muted, strokeWidth: 1.6)
-                    .padding(.top, 14)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(tip.category)
+                    .font(AppTypography.micro)
+                    .tracking(2.5)
+                    .textCase(.uppercase)
+                    .foregroundStyle(muted)
+                Text(tip.title)
+                    .font(AppTypography.serif(19, weight: .medium))
+                    .foregroundStyle(ink)
+                    .kerning(-0.3)
+                    .multilineTextAlignment(.leading)
+                    .lineSpacing(1.15)
+                Text(tip.dek)
+                    .font(AppTypography.serifItalic(13))
+                    .foregroundStyle(muted)
+                    .multilineTextAlignment(.leading)
+                    .lineSpacing(1.4)
             }
-            .padding(.vertical, 16)
-            .frame(maxWidth: .infinity, alignment: .leading)
 
-            DottedRule(color: AppColors.ruleStrong(for: scheme), opacity: 0.34)
+            Spacer()
+
+            InkIconView(icon: .chevron, size: 14, color: muted, strokeWidth: 1.6)
+                .padding(.top, 14)
         }
+        .padding(.vertical, 16)
+        .padding(.horizontal, 14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: AppCorners.row, style: .continuous)
+                .fill(AppColors.surface(for: scheme))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppCorners.row, style: .continuous)
+                .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+        )
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(tip.category). \(tip.title) — \(tip.dek)")

@@ -34,6 +34,7 @@ struct ZineTabBar: View {
     var body: some View {
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
+        let surface = AppColors.surface(for: scheme)
 
         VStack(spacing: 0) {
             Rule(color: AppColors.rule(for: scheme))
@@ -54,7 +55,12 @@ struct ZineTabBar: View {
                                 .textCase(.uppercase)
                                 .foregroundStyle(active ? accent : muted)
                         }
+                        .padding(.vertical, 6)
                         .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                                .fill(active ? AppColors.chip(for: scheme) : .clear)
+                        )
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
@@ -62,9 +68,10 @@ struct ZineTabBar: View {
                     .accessibilityAddTraits(tab == selection ? .isSelected : [])
                 }
             }
-            .padding(.top, 8)
+            .padding(.horizontal, 8)
+            .padding(.top, 5)
             .padding(.bottom, 5)
         }
-        .background(AppColors.background(for: scheme))
+        .background(surface)
     }
 }

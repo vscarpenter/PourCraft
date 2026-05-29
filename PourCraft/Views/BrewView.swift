@@ -4,6 +4,8 @@ import SwiftUI
 /// (roast, dose, the pour) plus a "Begin the brew" CTA that jumps to Guide.
 struct BrewView: View {
     @Bindable var brewModel: BrewModel
+    let morningPreset: BrewPreset?
+    let onSaveMorningPreset: () -> Void
     let onStartBrew: () -> Void
 
     @Environment(\.colorScheme) private var scheme
@@ -35,7 +37,12 @@ struct BrewView: View {
                 }
                 .padding(.top, 24)
 
-                BeginBrewBlock(brewModel: brewModel, onStartBrew: onStartBrew)
+                BeginBrewBlock(
+                    brewModel: brewModel,
+                    morningPreset: morningPreset,
+                    onSaveMorningPreset: onSaveMorningPreset,
+                    onStartBrew: onStartBrew
+                )
                     .padding(.top, 24)
                     .padding(.horizontal, 24)
 
@@ -46,18 +53,15 @@ struct BrewView: View {
     }
 }
 
-// MARK: - Roast list (chip-tinted rows, 3px copper ruler-mark when selected)
+// MARK: - Roast list (rounded rows, terracotta ruler-mark when selected)
 
 private struct RoastList: View {
     @Bindable var brewModel: BrewModel
-    @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        VStack(spacing: 0) {
-            Rule(color: AppColors.rule(for: scheme))
+        VStack(spacing: 8) {
             ForEach(Roast.allCases) { roast in
                 RoastRow(roast: roast, brewModel: brewModel)
-                Rule(color: AppColors.rule(for: scheme))
             }
         }
     }
@@ -74,6 +78,7 @@ private struct RoastRow: View {
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
         let chip = AppColors.chip(for: scheme)
+        let surface = AppColors.surface(for: scheme)
 
         Button {
             withAnimation(.snappy) {
@@ -81,11 +86,11 @@ private struct RoastRow: View {
             }
         } label: {
             HStack(alignment: .top, spacing: 0) {
-                // 3px copper ruler-mark on the left edge — present always so
-                // text alignment doesn't shift, copper only when selected.
-                Rectangle()
+                // Present always so text alignment doesn't shift.
+                RoundedRectangle(cornerRadius: 2, style: .continuous)
                     .fill(selected ? accent : .clear)
                     .frame(width: 3)
+                    .padding(.vertical, 12)
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .firstTextBaseline) {
@@ -114,10 +119,17 @@ private struct RoastRow: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.leading, 14)
-                .padding(.trailing, 4)
-                .padding(.vertical, 8)
+                .padding(.trailing, 12)
+                .padding(.vertical, 12)
             }
-            .background(selected ? chip : .clear)
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.row, style: .continuous)
+                    .fill(selected ? chip : surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.row, style: .continuous)
+                    .stroke(selected ? accent.opacity(0.42) : AppColors.rule(for: scheme), lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
@@ -199,7 +211,12 @@ private struct StepperButton: View {
             )
             .frame(width: 44, height: 44)
             .background(
-                Circle().strokeBorder(AppColors.ink(for: scheme), lineWidth: 1)
+                RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                    .fill(AppColors.surface(for: scheme))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                    .stroke(AppColors.rule(for: scheme), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -215,6 +232,7 @@ private struct DoseRuler: View {
 
     private let minValue: Double = 10
     private let maxValue: Double = 60
+    private static let tickMarks = Array(stride(from: 10, through: 60, by: 1))
 
     var body: some View {
         let ink = AppColors.ink(for: scheme)
@@ -227,7 +245,7 @@ private struct DoseRuler: View {
 
             ZStack(alignment: .topLeading) {
                 HStack(alignment: .top, spacing: 0) {
-                    ForEach(Array(stride(from: 10, through: 60, by: 1)), id: \.self) { tick in
+                    ForEach(Self.tickMarks, id: \.self) { tick in
                         let isMajor = tick % 5 == 0
                         Rectangle()
                             .fill(ink.opacity(isMajor ? 0.85 : 0.35))
@@ -252,9 +270,10 @@ private struct DoseRuler: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { drag in
+                        guard geo.size.width > 0 else { return }
                         let clampedX = max(0, min(geo.size.width, drag.location.x))
                         let newPct = clampedX / geo.size.width
-                        value = (minValue + newPct * range).rounded()
+                        setValue(minValue + newPct * range)
                     }
             )
         }
@@ -264,70 +283,72 @@ private struct DoseRuler: View {
         .accessibilityValue("\(Int(value)) grams")
         .accessibilityAdjustableAction { direction in
             switch direction {
-            case .increment: value += 1
-            case .decrement: value -= 1
+            case .increment: setValue(value + 1)
+            case .decrement: setValue(value - 1)
             @unknown default: break
             }
         }
+    }
+
+    private func setValue(_ newValue: Double) {
+        let clamped = min(max(newValue, minValue), maxValue).rounded()
+        guard clamped != value else { return }
+        value = clamped
     }
 }
 
 // MARK: - Pour block (Total · single rule · the smaller rows)
 
 private struct PourBlock: View {
-    let brewModel: BrewModel
+    @Bindable var brewModel: BrewModel
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(spacing: 0) {
-                PourLine(
-                    icon: .v60,
-                    label: "Total water",
-                    value: integer(brewModel.totalWater),
-                    unit: "g",
-                    big: true
-                )
+            CafeCard(padding: 18) {
+                VStack(spacing: 0) {
+                    PourLine(
+                        icon: .v60,
+                        label: "Total water",
+                        value: integer(brewModel.totalWater),
+                        unit: "g",
+                        big: true
+                    )
 
-                Rule(color: AppColors.rule(for: scheme))
-                    .padding(.vertical, 14)
+                    Rule(color: AppColors.rule(for: scheme))
+                        .padding(.vertical, 14)
 
-                PourLine(
-                    icon: .bloom,
-                    label: "Bloom · 30 sec",
-                    value: integer(brewModel.bloomWater),
-                    unit: "g"
-                )
-                .padding(.bottom, 10)
+                    PourLine(
+                        icon: .bloom,
+                        label: "Bloom · 30 sec",
+                        value: integer(brewModel.bloomWater),
+                        unit: "g"
+                    )
+                    .padding(.bottom, 10)
 
-                PourLine(
-                    icon: .spiral,
-                    label: "Remaining · spiral",
-                    value: integer(brewModel.remainingWater),
-                    unit: "g"
-                )
-                .padding(.bottom, 10)
+                    PourLine(
+                        icon: .spiral,
+                        label: "Remaining · spiral",
+                        value: integer(brewModel.remainingWater),
+                        unit: "g"
+                    )
+                    .padding(.bottom, 10)
 
-                PourLine(
-                    icon: .thermo,
-                    label: "Water temp",
-                    value: brewModel.temperatureRange,
-                    unit: nil
-                )
+                    PourLine(
+                        icon: .thermo,
+                        label: "Water temp",
+                        value: brewModel.temperatureRange,
+                        unit: nil
+                    )
+                }
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 18)
-            .background(AppColors.surface(for: scheme))
-            .overlay(
-                Rectangle().stroke(AppColors.rule(for: scheme), lineWidth: 1)
-            )
 
             HStack {
                 Text("Display in")
                     .font(AppTypography.serifItalic(13))
                     .foregroundStyle(AppColors.muted(for: scheme))
                 Spacer()
-                TempUnitToggle(brewModel: brewModel)
+                TemperatureUnitPicker(selection: $brewModel.temperatureUnit, horizontalPadding: 16)
             }
             .padding(.top, 14)
         }
@@ -380,54 +401,15 @@ private struct PourLine: View {
     }
 }
 
-private struct TempUnitToggle: View {
-    @Bindable var brewModel: BrewModel
-    @Environment(\.colorScheme) private var scheme
-
-    var body: some View {
-        let ink = AppColors.ink(for: scheme)
-        let bg = AppColors.background(for: scheme)
-
-        HStack(spacing: 0) {
-            ForEach(TemperatureUnit.allCases, id: \.self) { unit in
-                let selected = brewModel.temperatureUnit == unit
-                Button {
-                    brewModel.temperatureUnit = unit
-                } label: {
-                    Text(unit.toggleLabel)
-                        .font(AppTypography.sans(.caption, weight: .semibold))
-                        .tracking(1)
-                        .foregroundStyle(selected ? bg : ink)
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, 16)
-                        .background(selected ? ink : .clear)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .overlay(Capsule().stroke(ink, lineWidth: 1))
-        .clipShape(Capsule())
-    }
-}
-
-private extension TemperatureUnit {
-    var toggleLabel: String {
-        switch self {
-        case .fahrenheit: "\u{00B0}F"
-        case .celsius: "\u{00B0}C"
-        }
-    }
-}
-
 // MARK: - Begin brew CTA + save preset pill
 
 private struct BeginBrewBlock: View {
     let brewModel: BrewModel
+    let morningPreset: BrewPreset?
+    let onSaveMorningPreset: () -> Void
     let onStartBrew: () -> Void
 
     @Environment(\.colorScheme) private var scheme
-    @AppStorage("savedPresetRoast") private var savedPresetRoast: String = ""
-    @AppStorage("savedPresetWeight") private var savedPresetWeight: Double = 0
 
     var body: some View {
         let accent = AppColors.accent(for: scheme)
@@ -455,26 +437,26 @@ private struct BeginBrewBlock: View {
                 .padding(.vertical, 18)
                 .padding(.horizontal, 22)
                 .frame(maxWidth: .infinity)
-                .background(Rectangle().fill(accent))
+                .background(
+                    RoundedRectangle(cornerRadius: AppCorners.card, style: .continuous)
+                        .fill(accent)
+                )
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Begin the brew. Switches to the Guide tab.")
 
             SavePresetPill(
                 isSaved: presetMatchesCurrent,
-                onSave: savePreset
+                onSave: onSaveMorningPreset
             )
         }
     }
 
     private var presetMatchesCurrent: Bool {
-        savedPresetRoast == brewModel.selectedRoast.rawValue
-            && Int(savedPresetWeight) == Int(brewModel.coffeeWeight)
-    }
-
-    private func savePreset() {
-        savedPresetRoast = brewModel.selectedRoast.rawValue
-        savedPresetWeight = brewModel.coffeeWeight
+        morningPreset?.matches(
+            roast: brewModel.selectedRoast,
+            coffeeWeight: brewModel.coffeeWeight
+        ) == true
     }
 }
 
@@ -485,7 +467,6 @@ private struct SavePresetPill: View {
 
     var body: some View {
         let ink = AppColors.ink(for: scheme)
-        let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
 
         Button(action: onSave) {
@@ -503,8 +484,12 @@ private struct SavePresetPill: View {
             .kerning(-0.1)
             .padding(.vertical, 8)
             .padding(.horizontal, 16)
+            .background(
+                Capsule()
+                    .fill(isSaved ? AppColors.chip(for: scheme) : AppColors.surface(for: scheme))
+            )
             .overlay(
-                Capsule().stroke(isSaved ? accent : muted, lineWidth: 1)
+                Capsule().stroke(isSaved ? accent : AppColors.rule(for: scheme), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)

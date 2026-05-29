@@ -86,8 +86,7 @@ private struct RecipeSummaryStrip: View {
     var body: some View {
         let muted = AppColors.muted(for: scheme)
 
-        VStack(spacing: 0) {
-            Rule(color: AppColors.rule(for: scheme))
+        CafeCard(padding: 14) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("Today's Recipe")
@@ -107,8 +106,6 @@ private struct RecipeSummaryStrip: View {
                     SummaryCell(key: "Temp", value: brewModel.temperaturePoint)
                 }
             }
-            .padding(.vertical, 13)
-            Rule(color: AppColors.rule(for: scheme))
         }
     }
 }
@@ -149,8 +146,7 @@ private struct TimerStrip: View {
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
 
-        VStack(spacing: 0) {
-            Rule(color: AppColors.rule(for: scheme))
+        CafeCard(padding: 14) {
             VStack(spacing: 12) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -183,16 +179,16 @@ private struct TimerStrip: View {
                 // Progress rule
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Rectangle()
+                        Capsule()
                             .fill(AppColors.rule(for: scheme))
-                            .frame(height: 2)
-                        Rectangle()
+                            .frame(height: 4)
+                        Capsule()
                             .fill(accent)
-                            .frame(width: max(0, geo.size.width * timerModel.progress), height: 2)
+                            .frame(width: max(0, geo.size.width * timerModel.progress), height: 4)
                             .animation(.linear(duration: 1), value: timerModel.progress)
                     }
                 }
-                .frame(height: 2)
+                .frame(height: 4)
 
                 HStack(spacing: 12) {
                     if timerModel.phase != .ready {
@@ -208,8 +204,6 @@ private struct TimerStrip: View {
                     .disabled(timerModel.phase == .done)
                 }
             }
-            .padding(.vertical, 14)
-            Rule(color: AppColors.rule(for: scheme))
         }
     }
 
@@ -256,7 +250,10 @@ private struct SolidButtonStyle: ButtonStyle {
             .foregroundStyle(onAccent)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            .background(Rectangle().fill(accent))
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                    .fill(accent)
+            )
             .opacity(configuration.isPressed ? 0.85 : 1.0)
     }
 }
@@ -272,7 +269,14 @@ private struct GhostButtonStyle: ButtonStyle {
             .foregroundStyle(ink)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            .overlay(Rectangle().stroke(ink, lineWidth: 1))
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                    .fill(AppColors.surface(for: scheme))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                    .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+            )
             .opacity(configuration.isPressed ? 0.85 : 1.0)
     }
 }
@@ -283,7 +287,6 @@ private struct StepsSection: View {
     let brewModel: BrewModel
     let timerModel: BrewTimerModel
     @Binding var manuallyExpanded: Int?
-    @Environment(\.colorScheme) private var scheme
 
     var body: some View {
         let steps = BrewStep.steps(for: brewModel)
@@ -295,7 +298,7 @@ private struct StepsSection: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 8)
 
-            VStack(spacing: 0) {
+            VStack(spacing: 8) {
                 ForEach(steps) { step in
                     StepRow(
                         step: step,
@@ -344,64 +347,70 @@ private struct StepRow: View {
         let ink = AppColors.ink(for: scheme)
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
+        let surface = AppColors.surface(for: scheme)
 
         Button(action: onTap) {
-            VStack(spacing: 0) {
-                HStack(alignment: .top, spacing: 0) {
-                    Rectangle()
-                        .fill(active ? accent : .clear)
-                        .frame(width: 3)
-
-                    HStack(alignment: .top, spacing: 14) {
-                        Text(step.numberLabel)
-                            .font(AppTypography.serif(36, weight: .regular))
-                            .foregroundStyle(active ? accent : ink)
-                            .kerning(-1.5)
-                            .frame(width: 44, alignment: .leading)
-                            .animation(.snappy, value: active)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 10) {
-                                InkIconView(
-                                    icon: step.icon, size: 18,
-                                    color: active ? accent : ink, strokeWidth: 1.4
-                                )
-                                Text(step.title)
-                                    .font(AppTypography.serif(18, weight: .medium))
-                                    .foregroundStyle(ink)
-                                    .kerning(-0.3)
-                            }
-                            Text(step.meta)
-                                .font(AppTypography.micro)
-                                .tracking(2)
-                                .textCase(.uppercase)
-                                .foregroundStyle(muted)
-                                .padding(.bottom, 2)
-                            Text(step.body)
-                                .font(AppTypography.serif(14))
-                                .foregroundStyle(ink)
-                                .opacity(active ? 1 : 0.85)
-                                .lineLimit(active ? nil : 1)
-                                .multilineTextAlignment(.leading)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .animation(.snappy, value: active)
-                        }
-
-                        InkIconView(
-                            icon: .chevron, size: 14,
-                            color: muted, strokeWidth: 1.6
-                        )
-                        .rotationEffect(.degrees(active ? 90 : 0))
-                        .padding(.top, 10)
-                        .animation(.snappy, value: active)
-                    }
-                    .padding(.leading, 11)
+            HStack(alignment: .top, spacing: 0) {
+                RoundedRectangle(cornerRadius: 2, style: .continuous)
+                    .fill(active ? accent : .clear)
+                    .frame(width: 3)
                     .padding(.vertical, 14)
-                    .padding(.trailing, 0)
+
+                HStack(alignment: .top, spacing: 14) {
+                    Text(step.numberLabel)
+                        .font(AppTypography.serif(36, weight: .regular))
+                        .foregroundStyle(active ? accent : ink)
+                        .kerning(-1.5)
+                        .frame(width: 44, alignment: .leading)
+                        .animation(.snappy, value: active)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 10) {
+                            InkIconView(
+                                icon: step.icon, size: 18,
+                                color: active ? accent : ink, strokeWidth: 1.4
+                            )
+                            Text(step.title)
+                                .font(AppTypography.serif(18, weight: .medium))
+                                .foregroundStyle(ink)
+                                .kerning(-0.3)
+                        }
+                        Text(step.meta)
+                            .font(AppTypography.micro)
+                            .tracking(2)
+                            .textCase(.uppercase)
+                            .foregroundStyle(muted)
+                            .padding(.bottom, 2)
+                        Text(step.body)
+                            .font(AppTypography.serif(14))
+                            .foregroundStyle(ink)
+                            .opacity(active ? 1 : 0.85)
+                            .lineLimit(active ? nil : 1)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .animation(.snappy, value: active)
+                    }
+
+                    InkIconView(
+                        icon: .chevron, size: 14,
+                        color: muted, strokeWidth: 1.6
+                    )
+                    .rotationEffect(.degrees(active ? 90 : 0))
+                    .padding(.top, 10)
+                    .animation(.snappy, value: active)
                 }
-                .background(active ? AppColors.chip(for: scheme) : .clear)
-                Rule(color: AppColors.rule(for: scheme))
+                .padding(.leading, 11)
+                .padding(.vertical, 14)
+                .padding(.trailing, 12)
             }
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.row, style: .continuous)
+                    .fill(active ? AppColors.chip(for: scheme) : surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.row, style: .continuous)
+                    .stroke(active ? accent.opacity(0.42) : AppColors.rule(for: scheme), lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)

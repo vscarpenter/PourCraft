@@ -21,7 +21,7 @@ struct PourCraftApp: App {
                 AppColors.background(for: colorScheme)
                     .ignoresSafeArea()
 
-                content
+                tabContent
                     .safeAreaInset(edge: .bottom, spacing: 0) {
                         ZineTabBar(selection: $selectedTab)
                     }
@@ -52,19 +52,42 @@ struct PourCraftApp: App {
         }
     }
 
-    @ViewBuilder
-    private var content: some View {
-        switch selectedTab {
-        case .brew:
-            BrewView(brewModel: brewModel) {
+    private var tabContent: some View {
+        TabView(selection: $selectedTab) {
+            BrewView(
+                brewModel: brewModel,
+                morningPreset: morningPreset,
+                onSaveMorningPreset: saveMorningPreset
+            ) {
                 withAnimation(.snappy) { selectedTab = .guide }
             }
-        case .guide:
+            .tag(ZineTab.brew)
+            .tabItem { Label(ZineTab.brew.label, systemImage: ZineTab.brew.symbol) }
+
             GuideView(brewModel: brewModel, timerModel: timerModel)
-        case .tips:
+                .tag(ZineTab.guide)
+                .tabItem { Label(ZineTab.guide.label, systemImage: ZineTab.guide.symbol) }
+
             TipsView()
-        case .about:
+                .tag(ZineTab.tips)
+                .tabItem { Label(ZineTab.tips.label, systemImage: ZineTab.tips.symbol) }
+
             AboutView(brewModel: brewModel)
+                .tag(ZineTab.about)
+                .tabItem { Label(ZineTab.about.label, systemImage: ZineTab.about.symbol) }
         }
+        .toolbar(.hidden, for: .tabBar)
+    }
+
+    private var morningPreset: BrewPreset? {
+        guard savedPresetWeight > 0, let roast = Roast(rawValue: savedPresetRoast) else {
+            return nil
+        }
+        return BrewPreset(roast: roast, coffeeWeight: savedPresetWeight)
+    }
+
+    private func saveMorningPreset() {
+        savedPresetRoast = brewModel.selectedRoast.rawValue
+        savedPresetWeight = brewModel.coffeeWeight
     }
 }

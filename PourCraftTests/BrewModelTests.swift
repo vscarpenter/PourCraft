@@ -341,4 +341,13 @@ struct BrewModelTests {
         #expect(model.selectedRoast == .light)
         #expect(model.coffeeWeight == 28)
     }
+
+    @Test("Should match a morning preset by roast and whole-gram weight")
+    func shouldMatchMorningPresetByRoastAndWholeGramWeight() {
+        let preset = BrewPreset(roast: .medium, coffeeWeight: 20.4)
+
+        #expect(preset.matches(roast: .medium, coffeeWeight: 20.9))
+        #expect(!preset.matches(roast: .light, coffeeWeight: 20.9))
+        #expect(!preset.matches(roast: .medium, coffeeWeight: 21))
+    }
 }
