@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Tip article view — magazine spread for a single field-note. 110pt copper
+/// Tip article view — magazine spread for a single field-note. 110pt terracotta
 /// numeral hero, left-aligned body paragraphs, pull-quote between paragraphs
 /// 1 and 2, "by the numbers" reference block, and either a "Continued in"
 /// link or, on the final tip, an "end of contents" CTA back to Field Notes.
@@ -207,29 +207,30 @@ private struct ReferencesBlock: View {
                 .textCase(.uppercase)
                 .foregroundStyle(muted)
 
-            VStack(spacing: 0) {
-                ForEach(Array(tip.references.enumerated()), id: \.offset) { index, ref in
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(ref.key)
-                            .font(AppTypography.micro)
-                            .tracking(2)
-                            .textCase(.uppercase)
-                            .foregroundStyle(muted)
-                        Spacer()
-                        Text(ref.value)
-                            .font(AppTypography.serif(17, weight: .medium))
-                            .foregroundStyle(ink)
-                            .kerning(-0.3)
-                    }
-                    .padding(.vertical, 12)
-                    if index < tip.references.count - 1 {
-                        Rule(color: AppColors.rule(for: scheme), opacity: 0.6)
+            CafeCard(padding: 0) {
+                VStack(spacing: 0) {
+                    ForEach(Array(tip.references.enumerated()), id: \.offset) { index, ref in
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(ref.key)
+                                .font(AppTypography.micro)
+                                .tracking(2)
+                                .textCase(.uppercase)
+                                .foregroundStyle(muted)
+                            Spacer()
+                            Text(ref.value)
+                                .font(AppTypography.serif(17, weight: .medium))
+                                .foregroundStyle(ink)
+                                .kerning(-0.3)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        if index < tip.references.count - 1 {
+                            Rule(color: AppColors.rule(for: scheme), opacity: 0.6)
+                                .padding(.horizontal, 16)
+                        }
                     }
                 }
             }
-            .padding(.horizontal, 16)
-            .background(AppColors.surface(for: scheme))
-            .overlay(Rectangle().stroke(AppColors.rule(for: scheme), lineWidth: 1))
         }
     }
 }
@@ -246,15 +247,7 @@ private struct NextTipLink: View {
         let next = tip.nextTip
         let nextHook = next.title.split(separator: ".").first.map(String.init) ?? next.title
 
-        VStack(spacing: 0) {
-            Rectangle()
-                .fill(AppColors.ruleStrong(for: scheme))
-                .frame(height: 2)
-            Rectangle()
-                .fill(AppColors.ruleStrong(for: scheme))
-                .frame(height: 1)
-                .padding(.top, 2)
-
+        VStack(spacing: 10) {
             NavigationLink(value: next) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -271,7 +264,15 @@ private struct NextTipLink: View {
                     Spacer()
                     InkIconView(icon: .chevron, size: 16, color: accent, strokeWidth: 1.8)
                 }
-                .padding(.top, 18)
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: AppCorners.card, style: .continuous)
+                        .fill(AppColors.surface(for: scheme))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppCorners.card, style: .continuous)
+                        .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+                )
             }
             .buttonStyle(.plain)
         }
@@ -311,6 +312,16 @@ private struct EndOfContents: View {
                         .foregroundStyle(accent)
                         .kerning(-0.2)
                 }
+                .padding(.vertical, 10)
+                .padding(.horizontal, 16)
+                .background(
+                    Capsule()
+                        .fill(AppColors.surface(for: scheme))
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+                )
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Back to Field Notes")

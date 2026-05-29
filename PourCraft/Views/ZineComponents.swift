@@ -1,5 +1,38 @@
 import SwiftUI
 
+enum AppCorners {
+    static let card: CGFloat = 18
+    static let row: CGFloat = 16
+    static let control: CGFloat = 14
+}
+
+// MARK: - Cafe card
+
+struct CafeCard<Content: View>: View {
+    @Environment(\.colorScheme) private var scheme
+
+    let padding: CGFloat
+    let content: Content
+
+    init(padding: CGFloat = 16, @ViewBuilder content: () -> Content) {
+        self.padding = padding
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding(padding)
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.card, style: .continuous)
+                    .fill(AppColors.surface(for: scheme))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.card, style: .continuous)
+                    .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+            )
+    }
+}
+
 // MARK: - Rule (horizontal divider)
 
 /// A flat horizontal divider. Pairs of rules (2px + 1px) carry the
@@ -244,5 +277,54 @@ struct ZineSection<Content: View>: View {
             content
         }
         .padding(.horizontal, 24)
+    }
+}
+
+// MARK: - TemperatureUnitPicker
+
+struct TemperatureUnitPicker: View {
+    @Binding var selection: TemperatureUnit
+    var horizontalPadding: CGFloat = 14
+
+    @Environment(\.colorScheme) private var scheme
+
+    var body: some View {
+        let ink = AppColors.ink(for: scheme)
+        let accent = AppColors.accent(for: scheme)
+        let onAccent = AppColors.onAccent(for: scheme)
+
+        HStack(spacing: 0) {
+            ForEach(TemperatureUnit.allCases, id: \.self) { unit in
+                let selected = selection == unit
+                Button {
+                    withAnimation(.snappy) {
+                        selection = unit
+                    }
+                } label: {
+                    Text(unit.label)
+                        .font(AppTypography.sans(.caption, weight: .semibold))
+                        .tracking(1)
+                        .foregroundStyle(selected ? onAccent : ink)
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, horizontalPadding)
+                        .background(
+                            RoundedRectangle(cornerRadius: AppCorners.control - 4, style: .continuous)
+                                .fill(selected ? accent : .clear)
+                        )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(unit == .fahrenheit ? "Fahrenheit" : "Celsius")
+                .accessibilityAddTraits(selected ? .isSelected : [])
+            }
+        }
+        .padding(3)
+        .background(
+            RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                .fill(AppColors.surface(for: scheme))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+        )
     }
 }

@@ -1,39 +1,39 @@
 import SwiftUI
 
-/// Editorial Zine palette. Two adaptive sets — light cream paper and dark
-/// paper — plus derived helpers (rule, chip) that stay in lockstep with the
+/// Editorial Zine palette. Two adaptive sets -- warm cafe paper and dark
+/// paper -- plus derived helpers (rule, chip) that stay in lockstep with the
 /// scheme's accent.
 ///
 /// All values come from the design handoff (`design_handoff_pourcraft_zine`).
 /// Where the handoff and earlier Swift values disagreed, the handoff wins.
 enum AppColors {
-    // MARK: - Light Mode (cream paper)
+    // MARK: - Light Mode (warm cafe paper)
 
-    static let lightBackground = Color(hex: "FBF3E5")
-    static let lightSurface = Color(hex: "FFF8EC")
-    static let lightSurface2 = Color(hex: "F0E6D0")
-    static let lightInk = Color(hex: "2A1F1B")
-    static let lightMuted = Color(hex: "6B5239")
-    static let lightMutedSoft = Color(hex: "8A6F52")
-    static let lightAccent = Color(hex: "B87333")
-    static let lightAccentInk = Color(hex: "FFF8EC")
+    static let lightBackground = Color(hex: "FFF7EA")
+    static let lightSurface = Color(hex: "FFFCF4")
+    static let lightSurface2 = Color(hex: "EADCC4")
+    static let lightInk = Color(hex: "2F211A")
+    static let lightMuted = Color(hex: "78604E")
+    static let lightMutedSoft = Color(hex: "987C63")
+    static let lightAccent = Color(hex: "BF6745")
+    static let lightAccentInk = Color(hex: "FFF7EA")
 
     // MARK: - Dark Mode (dark paper)
 
-    static let darkBackground = Color(hex: "221915")
-    static let darkSurface = Color(hex: "2C211C")
-    static let darkSurface2 = Color(hex: "352721")
-    static let darkInk = Color(hex: "F0E6D6")
+    static let darkBackground = Color(hex: "201614")
+    static let darkSurface = Color(hex: "2B201B")
+    static let darkSurface2 = Color(hex: "3A2A23")
+    static let darkInk = Color(hex: "F6E8D4")
     /// Raised from `#B89A7E` to clear WCAG AA for tiny uppercase kickers.
-    static let darkMuted = Color(hex: "C4A88A")
-    static let darkMutedSoft = Color(hex: "A38A6E")
-    static let darkAccent = Color(hex: "D4935A")
-    static let darkAccentInk = Color(hex: "221915")
+    static let darkMuted = Color(hex: "D0B497")
+    static let darkMutedSoft = Color(hex: "B79577")
+    static let darkAccent = Color(hex: "E08A62")
+    static let darkAccentInk = Color(hex: "201614")
 
     // MARK: - Phase / semantic accents (kept for the timer ring)
 
-    static let bloomOrange = Color(hex: "D4854A")
-    static let sageBrew = Color(hex: "7A9E7E")
+    static let bloomOrange = Color(hex: "C5794F")
+    static let sageBrew = Color(hex: "7F9B78")
 
     // MARK: - Adaptive helpers
 

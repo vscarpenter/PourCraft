@@ -90,20 +90,22 @@ private struct SettingsSection: View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeader(number: "01", kicker: "Settings")
 
-            VStack(spacing: 0) {
-                SettingRow(label: "Display temperature in") {
-                    UnitSegmentToggle(brewModel: brewModel)
+            CafeCard(padding: 0) {
+                VStack(spacing: 0) {
+                    SettingRow(label: "Display temperature in") {
+                        TemperatureUnitPicker(selection: $brewModel.temperatureUnit)
+                    }
+                    ToggleSettingRow(
+                        label: "Haptic feedback",
+                        accessibilityHint: "Plays a tap on each brew-phase change",
+                        isOn: $brewModel.hapticsEnabled
+                    )
+                    ToggleSettingRow(
+                        label: "Auto-advance brew steps",
+                        accessibilityHint: "Highlights the step matching the live timer phase",
+                        isOn: $brewModel.autoAdvanceSteps
+                    )
                 }
-                ToggleSettingRow(
-                    label: "Haptic feedback",
-                    accessibilityHint: "Plays a tap on each brew-phase change",
-                    isOn: $brewModel.hapticsEnabled
-                )
-                ToggleSettingRow(
-                    label: "Auto-advance brew steps",
-                    accessibilityHint: "Highlights the step matching the live timer phase",
-                    isOn: $brewModel.autoAdvanceSteps
-                )
             }
         }
     }
@@ -124,13 +126,15 @@ private struct SettingRow<Trailing: View>: View {
                 trailing()
             }
             .padding(.vertical, 12)
+            .padding(.horizontal, 16)
             .frame(minHeight: 44)
             Rule(color: AppColors.rule(for: scheme))
+                .padding(.horizontal, 16)
         }
     }
 }
 
-/// Tappable row whose trailing label flips between italic copper "On" / muted "Off".
+/// Tappable row whose trailing label flips between italic terracotta "On" / muted "Off".
 /// The whole row is the hit target so it matches the 44pt zine row spec.
 private struct ToggleSettingRow: View {
     let label: String
@@ -159,6 +163,7 @@ private struct ToggleSettingRow: View {
                         .animation(.snappy, value: isOn)
                 }
                 .padding(.vertical, 12)
+                .padding(.horizontal, 16)
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
             }
@@ -169,47 +174,7 @@ private struct ToggleSettingRow: View {
             .accessibilityAddTraits(.isButton)
 
             Rule(color: AppColors.rule(for: scheme))
-        }
-    }
-}
-
-private struct UnitSegmentToggle: View {
-    @Bindable var brewModel: BrewModel
-    @Environment(\.colorScheme) private var scheme
-
-    var body: some View {
-        let ink = AppColors.ink(for: scheme)
-        let bg = AppColors.background(for: scheme)
-
-        HStack(spacing: 0) {
-            ForEach(TemperatureUnit.allCases, id: \.self) { unit in
-                let selected = brewModel.temperatureUnit == unit
-                Button {
-                    brewModel.temperatureUnit = unit
-                } label: {
-                    Text(unit.shortLabel)
-                        .font(AppTypography.sans(.caption, weight: .semibold))
-                        .tracking(1)
-                        .foregroundStyle(selected ? bg : ink)
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, 14)
-                        .background(selected ? ink : .clear)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(unit == .fahrenheit ? "Fahrenheit" : "Celsius")
-                .accessibilityAddTraits(selected ? .isSelected : [])
-            }
-        }
-        .overlay(Capsule().stroke(ink, lineWidth: 1))
-        .clipShape(Capsule())
-    }
-}
-
-private extension TemperatureUnit {
-    var shortLabel: String {
-        switch self {
-        case .fahrenheit: "\u{00B0}F"
-        case .celsius: "\u{00B0}C"
+                .padding(.horizontal, 16)
         }
     }
 }
@@ -223,26 +188,28 @@ private struct ReadingRoomSection: View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeader(number: "02", kicker: "The Reading Room")
 
-            VStack(spacing: 0) {
-                ChevronRow(label: "Rate PourCraft") {
-                    let reviewURL = "https://apps.apple.com/us/app/pourcraft-coffee/id6759871953?action=write-review"
-                    if let url = URL(string: reviewURL) {
-                        openURL(url)
+            CafeCard(padding: 0) {
+                VStack(spacing: 0) {
+                    ChevronRow(label: "Rate PourCraft") {
+                        let reviewURL = "https://apps.apple.com/us/app/pourcraft-coffee/id6759871953?action=write-review"
+                        if let url = URL(string: reviewURL) {
+                            openURL(url)
+                        }
                     }
-                }
-                ChevronRow(label: "Share with a friend") {
-                    if let url = URL(string: "https://www.pourcraftcoffee.com/") {
-                        openURL(url)
+                    ChevronRow(label: "Share with a friend") {
+                        if let url = URL(string: "https://www.pourcraftcoffee.com/") {
+                            openURL(url)
+                        }
                     }
-                }
-                ChevronRow(label: "Send feedback") {
-                    if let url = URL(string: "mailto:pourcraftcoffee@vinny.dev?subject=PourCraft%20feedback") {
-                        openURL(url)
+                    ChevronRow(label: "Send feedback") {
+                        if let url = URL(string: "mailto:pourcraftcoffee@vinny.dev?subject=PourCraft%20feedback") {
+                            openURL(url)
+                        }
                     }
-                }
-                ChevronRow(label: "Privacy policy") {
-                    if let url = URL(string: "https://www.pourcraftcoffee.com/privacy.html") {
-                        openURL(url)
+                    ChevronRow(label: "Privacy policy") {
+                        if let url = URL(string: "https://www.pourcraftcoffee.com/privacy.html") {
+                            openURL(url)
+                        }
                     }
                 }
             }
@@ -269,11 +236,13 @@ private struct ChevronRow: View {
                     InkIconView(icon: .chevron, size: 14, color: muted, strokeWidth: 1.6)
                 }
                 .padding(.vertical, 14)
+                .padding(.horizontal, 16)
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             Rule(color: AppColors.rule(for: scheme))
+                .padding(.horizontal, 16)
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
@@ -286,10 +255,11 @@ private struct MastheadSection: View {
     @Environment(\.openURL) private var openURL
 
     fileprivate struct Credit: Identifiable {
-        let id = UUID()
         let role: String
         let person: String
         let url: URL?
+
+        var id: String { "\(role)-\(person)" }
     }
 
     private var credits: [Credit] {
@@ -304,9 +274,11 @@ private struct MastheadSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeader(number: "03", kicker: "Masthead")
-            VStack(spacing: 0) {
-                ForEach(credits) { credit in
-                    CreditRow(credit: credit, openURL: openURL)
+            CafeCard(padding: 0) {
+                VStack(spacing: 0) {
+                    ForEach(credits) { credit in
+                        CreditRow(credit: credit, openURL: openURL)
+                    }
                 }
             }
         }
@@ -348,8 +320,10 @@ private struct CreditRow: View {
                 }
             }
             .padding(.vertical, 10)
+            .padding(.horizontal, 16)
             .frame(minHeight: 44)
             Rule(color: AppColors.rule(for: scheme), opacity: 0.6)
+                .padding(.horizontal, 16)
         }
     }
 }
