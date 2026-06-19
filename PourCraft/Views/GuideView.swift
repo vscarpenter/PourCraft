@@ -9,23 +9,56 @@ struct GuideView: View {
 
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.zineBottomScrollPadding) private var bottomScrollPadding
     @State private var manuallyExpanded: Int?
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                SubHeader(
-                    kicker: "The Method",
-                    subtitle: "Eight steps, in order, by the gram."
-                ) {
-                    HStack(spacing: 0) {
-                        Text("The ")
-                        Text("Method")
-                            .italic()
-                            .foregroundStyle(AppColors.accent(for: scheme))
-                        Text(".")
+        GeometryReader { geometry in
+            let usesWideLayout = AppLayout.usesWideLayout(width: geometry.size.width)
+
+            ScrollViewReader { proxy in
+                Group {
+                    if usesWideLayout {
+                        wideLayout(width: geometry.size.width)
+                    } else {
+                        compactLayout
                     }
                 }
+                .background(AppColors.background(for: scheme))
+                .sensoryFeedback(trigger: timerModel.phase) { oldValue, newValue in
+                    guard brewModel.hapticsEnabled, oldValue != newValue else { return nil }
+                    switch newValue {
+                    case .bloom, .pour, .drawdown: return .impact(weight: .medium)
+                    case .done: return .success
+                    case .ready: return nil
+                    }
+                }
+                .onAppear {
+                    syncTimerIfReady()
+                    timerModel.syncToNow()
+                    scrollToTimerStep(
+                        with: proxy,
+                        animated: false,
+                        anchor: usesWideLayout ? .center : .bottom
+                    )
+                }
+                .onChange(of: timerModel.phase) { _, _ in
+                    scrollToTimerStep(with: proxy, anchor: usesWideLayout ? .center : .bottom)
+                }
+                .onChange(of: brewModel.autoAdvanceSteps) { _, _ in
+                    scrollToTimerStep(with: proxy, anchor: usesWideLayout ? .center : .bottom)
+                }
+                .onChange(of: brewModel.coffeeWeight) { _, _ in syncTimerIfReady() }
+                .onChange(of: brewModel.selectedRoast) { _, _ in syncTimerIfReady() }
+                .onChange(of: scenePhase) { _, _ in timerModel.syncToNow() }
+            }
+        }
+    }
+
+    private var compactLayout: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                guideHeader
 
                 RecipeSummaryStrip(brewModel: brewModel)
                     .padding(.horizontal, 24)
@@ -46,25 +79,89 @@ struct GuideView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 28)
 
-                Color.clear.frame(height: 24)
+                Color.clear.frame(height: bottomScrollPadding)
             }
         }
-        .background(AppColors.background(for: scheme))
-        .sensoryFeedback(trigger: timerModel.phase) { oldValue, newValue in
-            guard brewModel.hapticsEnabled, oldValue != newValue else { return nil }
-            switch newValue {
-            case .bloom, .pour, .drawdown: return .impact(weight: .medium)
-            case .done: return .success
-            case .ready: return nil
+    }
+
+    private func wideLayout(width: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            guideHeader
+                .frame(maxWidth: AppLayout.iPadContentMaxWidth)
+                .frame(maxWidth: .infinity)
+
+            HStack(alignment: .top, spacing: AppLayout.iPadColumnSpacing) {
+                ScrollView {
+                    guideSidePanel
+                        .padding(.bottom, bottomScrollPadding)
+                }
+                .scrollIndicators(.hidden)
+                .frame(width: AppLayout.guideSidePanelWidth(for: width))
+
+                ScrollView {
+                    StepsSection(
+                        brewModel: brewModel,
+                        timerModel: timerModel,
+                        manuallyExpanded: $manuallyExpanded,
+                        horizontalPadding: 0
+                    )
+                    .padding(.top, 0)
+
+                    Color.clear.frame(height: bottomScrollPadding)
+                }
             }
+            .frame(maxWidth: AppLayout.iPadContentMaxWidth, maxHeight: .infinity, alignment: .top)
+            .padding(.horizontal, AppLayout.outerPadding(for: width))
+            .padding(.top, 24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .onAppear {
-            syncTimerIfReady()
-            timerModel.syncToNow()
+    }
+
+    private var guideHeader: some View {
+        SubHeader(
+            kicker: "The Method",
+            subtitle: "Eight steps, in order, by the gram."
+        ) {
+            HStack(spacing: 0) {
+                Text("The ")
+                Text("Method")
+                    .italic()
+                    .foregroundStyle(AppColors.accent(for: scheme))
+                Text(".")
+            }
+            .accessibilityIdentifier("guide.header.title")
         }
-        .onChange(of: brewModel.coffeeWeight) { _, _ in syncTimerIfReady() }
-        .onChange(of: brewModel.selectedRoast) { _, _ in syncTimerIfReady() }
-        .onChange(of: scenePhase) { _, _ in timerModel.syncToNow() }
+    }
+
+    private var guideSidePanel: some View {
+        VStack(spacing: 16) {
+            RecipeSummaryStrip(brewModel: brewModel)
+            TimerStrip(timerModel: timerModel, brewModel: brewModel)
+            OutroQuote()
+                .padding(.top, 10)
+        }
+    }
+
+    private func scrollToTimerStep(
+        with proxy: ScrollViewProxy,
+        animated: Bool = true,
+        anchor: UnitPoint = .bottom
+    ) {
+        guard brewModel.autoAdvanceSteps,
+              manuallyExpanded == nil,
+              let stepId = timerModel.phase.guideStepId else {
+            return
+        }
+
+        let scroll = {
+            proxy.scrollTo(stepId, anchor: anchor)
+        }
+
+        if animated {
+            withAnimation(.snappy) { scroll() }
+        } else {
+            scroll()
+        }
     }
 
     private func syncTimerIfReady() {
@@ -74,6 +171,18 @@ struct GuideView: View {
             remainingWater: brewModel.remainingWater,
             totalWater: brewModel.totalWater
         )
+    }
+}
+
+private extension BrewPhase {
+    var guideStepId: Int? {
+        switch self {
+        case .ready: nil
+        case .bloom: 4
+        case .pour: 6
+        case .drawdown: 7
+        case .done: 8
+        }
     }
 }
 
@@ -155,6 +264,7 @@ private struct TimerStrip: View {
                             .tracking(2.5)
                             .textCase(.uppercase)
                             .foregroundStyle(muted)
+                            .accessibilityIdentifier("guide.timer.title")
                         Text(timerModel.totalElapsedFormatted)
                             .font(AppTypography.serif(34, weight: .medium))
                             .foregroundStyle(ink)
@@ -162,6 +272,7 @@ private struct TimerStrip: View {
                             .monospacedDigit()
                             .contentTransition(.numericText())
                             .animation(.snappy, value: timerModel.elapsedSeconds)
+                            .accessibilityIdentifier("guide.timer.elapsed")
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 2) {
@@ -170,9 +281,11 @@ private struct TimerStrip: View {
                             .tracking(2.5)
                             .textCase(.uppercase)
                             .foregroundStyle(timerModel.phase == .ready ? muted : accent)
+                            .accessibilityIdentifier("guide.timer.phase")
                         Text("of \(timerModel.targetTimeFormatted)")
                             .font(AppTypography.serifItalic(13))
                             .foregroundStyle(muted)
+                            .accessibilityIdentifier("guide.timer.target")
                     }
                 }
 
@@ -190,6 +303,24 @@ private struct TimerStrip: View {
                 }
                 .frame(height: 4)
 
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(timerModel.phase == .ready ? "Ready" : "Now")
+                        .font(AppTypography.micro)
+                        .tracking(2)
+                        .textCase(.uppercase)
+                        .foregroundStyle(timerModel.phase == .ready ? muted : accent)
+                        .zineChromeLine(minimumScaleFactor: 0.7)
+
+                    Text(timerModel.phaseInstruction)
+                        .font(AppTypography.serifItalic(13))
+                        .foregroundStyle(muted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Spacer(minLength: 0)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("guide.timer.instruction")
+
                 HStack(spacing: 12) {
                     if timerModel.phase != .ready {
                         Button("Reset") {
@@ -202,6 +333,7 @@ private struct TimerStrip: View {
                     }
                     .buttonStyle(SolidButtonStyle())
                     .disabled(timerModel.phase == .done)
+                    .accessibilityIdentifier("guide.timer.primary")
                 }
             }
         }
@@ -287,6 +419,7 @@ private struct StepsSection: View {
     let brewModel: BrewModel
     let timerModel: BrewTimerModel
     @Binding var manuallyExpanded: Int?
+    var horizontalPadding: CGFloat = 24
 
     var body: some View {
         let steps = BrewStep.steps(for: brewModel)
@@ -295,7 +428,7 @@ private struct StepsSection: View {
             HStack {
                 SectionHeader(number: "01\u{2013}08", kicker: "Tap a step")
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, horizontalPadding)
             .padding(.bottom, 8)
 
             VStack(spacing: 8) {
@@ -305,9 +438,10 @@ private struct StepsSection: View {
                         active: isActive(step: step),
                         onTap: { toggle(step: step) }
                     )
+                    .id(step.id)
                 }
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, horizontalPadding)
         }
     }
 
@@ -316,18 +450,7 @@ private struct StepsSection: View {
             return manuallyExpanded == step.id
         }
         guard brewModel.autoAdvanceSteps else { return false }
-        return timerActiveStepId == step.id
-    }
-
-    /// The step id matching the timer's current phase, or nil for `.ready`.
-    private var timerActiveStepId: Int? {
-        switch timerModel.phase {
-        case .ready: nil
-        case .bloom: 4
-        case .pour: 6
-        case .drawdown: 7
-        case .done: 8
-        }
+        return timerModel.phase.guideStepId == step.id
     }
 
     private func toggle(step: BrewStep) {
@@ -414,6 +537,7 @@ private struct StepRow: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("guide.step.\(step.id)")
     }
 }
 

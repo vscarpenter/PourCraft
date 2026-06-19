@@ -6,6 +6,69 @@ enum AppCorners {
     static let control: CGFloat = 14
 }
 
+enum AppLayout {
+    static let bottomScrollPadding: CGFloat = 104
+    static let iPadScrollPadding: CGFloat = 40
+    static let iPadBreakpoint: CGFloat = 760
+    static let iPadSidebarWidth: CGFloat = 220
+    static let iPadContentMaxWidth: CGFloat = 1120
+    static let iPadArticleMaxWidth: CGFloat = 680
+    static let iPadColumnSpacing: CGFloat = 24
+    static let iPadOuterPadding: CGFloat = 32
+
+    static func usesWideLayout(width: CGFloat) -> Bool {
+        width >= iPadBreakpoint
+    }
+
+    static func sidebarWidth(for width: CGFloat) -> CGFloat {
+        width < 900 ? 196 : iPadSidebarWidth
+    }
+
+    static func outerPadding(for width: CGFloat) -> CGFloat {
+        width < 900 ? 24 : iPadOuterPadding
+    }
+
+    static func brewResultColumnWidth(for width: CGFloat) -> CGFloat {
+        width < 940 ? 360 : 420
+    }
+
+    static func guideSidePanelWidth(for width: CGFloat) -> CGFloat {
+        width < 940 ? 320 : 360
+    }
+
+    static func aboutSecondaryColumnWidth(for width: CGFloat) -> CGFloat {
+        width < 940 ? 360 : 430
+    }
+
+    static func tipsIndexWidth(for width: CGFloat) -> CGFloat {
+        let minimumWidth: CGFloat = width < 900 ? 300 : 328
+        return min(392, max(minimumWidth, width * 0.34))
+    }
+}
+
+private struct ZineBottomScrollPaddingKey: EnvironmentKey {
+    static let defaultValue: CGFloat = AppLayout.bottomScrollPadding
+}
+
+extension EnvironmentValues {
+    var zineBottomScrollPadding: CGFloat {
+        get { self[ZineBottomScrollPaddingKey.self] }
+        set { self[ZineBottomScrollPaddingKey.self] = newValue }
+    }
+}
+
+extension View {
+    /// Editorial chrome should remain recognizable at large accessibility sizes
+    /// without fragmenting into one-letter words.
+    func zineChromeLine(minimumScaleFactor: CGFloat = 0.72) -> some View {
+        self
+            .lineLimit(1)
+            .minimumScaleFactor(minimumScaleFactor)
+            .allowsTightening(true)
+            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+    }
+}
+
 // MARK: - Cafe card
 
 struct CafeCard<Content: View>: View {
@@ -98,6 +161,7 @@ struct Masthead<Title: View>: View {
             .textCase(.uppercase)
             .foregroundStyle(muted)
             .padding(.top, 6)
+            .zineChromeLine(minimumScaleFactor: 0.62)
 
             Rectangle()
                 .fill(AppColors.ruleStrong(for: scheme))
@@ -114,17 +178,22 @@ struct Masthead<Title: View>: View {
                 .kerning(-2)
                 .padding(.top, 14)
                 .padding(.bottom, 4)
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
+                .allowsTightening(true)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
 
-            HStack {
-                Text(subtitle)
-                    .font(AppTypography.serifItalic(14))
-                    .foregroundStyle(muted)
-                Spacer()
-                Text("EST. 2024")
-                    .font(AppTypography.kicker)
-                    .tracking(2)
-                    .textCase(.uppercase)
-                    .foregroundStyle(muted)
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    mastheadSubtitle(subtitle, color: muted)
+                    Spacer()
+                    mastheadEdition(color: muted)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    mastheadSubtitle(subtitle, color: muted)
+                    mastheadEdition(color: muted)
+                }
             }
 
             Rule(color: AppColors.rule(for: scheme))
@@ -133,6 +202,22 @@ struct Masthead<Title: View>: View {
         .padding(.horizontal, 24)
         .padding(.top, 4)
         .accessibilityElement(children: .combine)
+    }
+
+    private func mastheadSubtitle(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(AppTypography.serifItalic(14))
+            .foregroundStyle(color)
+            .zineChromeLine(minimumScaleFactor: 0.72)
+    }
+
+    private func mastheadEdition(color: Color) -> some View {
+        Text("EST. 2024")
+            .font(AppTypography.kicker)
+            .tracking(2)
+            .textCase(.uppercase)
+            .foregroundStyle(color)
+            .zineChromeLine(minimumScaleFactor: 0.72)
     }
 }
 
@@ -162,30 +247,22 @@ struct SubHeader<Title: View>: View {
         let muted = AppColors.muted(for: scheme)
 
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                if let onBack {
-                    Button(action: onBack) {
-                        HStack(spacing: 4) {
-                            InkIconView(
-                                icon: .chevron, size: 11,
-                                color: muted, strokeWidth: 1.6
-                            )
-                            .rotationEffect(.degrees(180))
-                            Text("Back")
-                        }
-                    }
-                    .buttonStyle(.plain)
-                } else {
-                    Text("PourCraft")
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    subHeaderLeading(onBack: onBack, color: muted)
+                    Spacer()
+                    subHeaderKicker(kicker, color: muted)
                 }
-                Spacer()
-                Text(kicker)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        subHeaderLeading(onBack: onBack, color: muted)
+                        Spacer()
+                    }
+                    subHeaderKicker(kicker, color: muted)
+                }
             }
-            .font(AppTypography.kicker)
-            .tracking(2.5)
-            .foregroundStyle(muted)
             .padding(.top, 6)
-            .textCase(.uppercase)
 
             Rectangle()
                 .fill(AppColors.ruleStrong(for: scheme))
@@ -198,16 +275,56 @@ struct SubHeader<Title: View>: View {
                 .kerning(-2)
                 .padding(.top, 18)
                 .padding(.bottom, 4)
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
+                .allowsTightening(true)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
 
             Text(subtitle)
                 .font(AppTypography.serifItalic(14))
                 .foregroundStyle(muted)
                 .padding(.bottom, 14)
+                .fixedSize(horizontal: false, vertical: true)
 
             Rule(color: AppColors.rule(for: scheme))
         }
         .padding(.horizontal, 24)
         .padding(.top, 4)
+    }
+
+    private func subHeaderLeading(onBack: (() -> Void)?, color: Color) -> some View {
+        Group {
+            if let onBack {
+                Button(action: onBack) {
+                    HStack(spacing: 4) {
+                        InkIconView(
+                            icon: .chevron, size: 11,
+                            color: color, strokeWidth: 1.6
+                        )
+                        .rotationEffect(.degrees(180))
+                        Text("Back")
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back")
+            } else {
+                Text("PourCraft")
+            }
+        }
+        .font(AppTypography.kicker)
+        .tracking(2.5)
+        .foregroundStyle(color)
+        .textCase(.uppercase)
+        .zineChromeLine(minimumScaleFactor: 0.62)
+    }
+
+    private func subHeaderKicker(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(AppTypography.kicker)
+            .tracking(2.5)
+            .foregroundStyle(color)
+            .textCase(.uppercase)
+            .zineChromeLine(minimumScaleFactor: 0.62)
     }
 }
 
@@ -222,23 +339,42 @@ struct SectionHeader: View {
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
 
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            Text("No. \(number)")
-                .font(AppTypography.micro)
-                .textCase(.uppercase)
-                .foregroundStyle(accent)
-                .tracking(2)
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                sectionNumber(color: accent)
 
-            Rectangle()
-                .fill(accent.opacity(0.42))
-                .frame(height: 1)
+                Rectangle()
+                    .fill(accent.opacity(0.42))
+                    .frame(height: 1)
 
-            Text(kicker)
-                .font(AppTypography.kicker)
-                .tracking(2)
-                .textCase(.uppercase)
-                .foregroundStyle(muted)
+                sectionKicker(color: muted)
+            }
+
+            HStack(alignment: .firstTextBaseline) {
+                sectionNumber(color: accent)
+                Spacer(minLength: 12)
+                sectionKicker(color: muted)
+            }
         }
+        .zineChromeLine(minimumScaleFactor: 0.62)
+    }
+
+    private func sectionNumber(color: Color) -> some View {
+        Text("No. \(number)")
+            .font(AppTypography.micro)
+            .textCase(.uppercase)
+            .foregroundStyle(color)
+            .tracking(2)
+            .zineChromeLine(minimumScaleFactor: 0.62)
+    }
+
+    private func sectionKicker(color: Color) -> some View {
+        Text(kicker)
+            .font(AppTypography.kicker)
+            .tracking(2)
+            .textCase(.uppercase)
+            .foregroundStyle(color)
+            .zineChromeLine(minimumScaleFactor: 0.62)
     }
 }
 
@@ -301,12 +437,13 @@ struct TemperatureUnitPicker: View {
                         selection = unit
                     }
                 } label: {
-                    Text(unit.label)
-                        .font(AppTypography.sans(.caption, weight: .semibold))
-                        .tracking(1)
-                        .foregroundStyle(selected ? onAccent : ink)
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, horizontalPadding)
+                Text(unit.label)
+                    .font(AppTypography.sans(.caption, weight: .semibold))
+                    .tracking(1)
+                    .foregroundStyle(selected ? onAccent : ink)
+                    .zineChromeLine(minimumScaleFactor: 0.75)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, horizontalPadding)
                         .background(
                             RoundedRectangle(cornerRadius: AppCorners.control - 4, style: .continuous)
                                 .fill(selected ? accent : .clear)

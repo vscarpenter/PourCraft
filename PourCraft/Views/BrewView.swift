@@ -9,47 +9,108 @@ struct BrewView: View {
     let onStartBrew: () -> Void
 
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.zineBottomScrollPadding) private var bottomScrollPadding
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                Masthead(subtitle: "A calculator, set in type.") {
-                    HStack(spacing: 0) {
-                        Text("The ")
-                        Text("Pour")
-                            .italic()
-                            .foregroundStyle(AppColors.accent(for: scheme))
-                    }
-                }
-
-                ZineSection(number: "01", title: "Choose your roast.", kicker: "Three options") {
-                    RoastList(brewModel: brewModel)
-                }
-                .padding(.top, 18)
-
-                ZineSection(number: "02", title: "Dial in the dose.", kicker: "Grams") {
-                    DoseInput(brewModel: brewModel)
-                }
-                .padding(.top, 20)
-
-                ZineSection(number: "03", title: "The pour, by weight.", kicker: "Computed") {
-                    PourBlock(brewModel: brewModel)
-                }
-                .padding(.top, 24)
-
-                BeginBrewBlock(
-                    brewModel: brewModel,
-                    morningPreset: morningPreset,
-                    onSaveMorningPreset: onSaveMorningPreset,
-                    onStartBrew: onStartBrew
-                )
-                    .padding(.top, 24)
-                    .padding(.horizontal, 24)
-
-                Color.clear.frame(height: 24)
+        GeometryReader { proxy in
+            if AppLayout.usesWideLayout(width: proxy.size.width) {
+                wideLayout(width: proxy.size.width)
+            } else {
+                compactLayout
             }
         }
         .background(AppColors.background(for: scheme))
+    }
+
+    private var compactLayout: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                brewMasthead
+
+                roastSection
+                    .padding(.top, 18)
+
+                doseSection
+                    .padding(.top, 20)
+
+                pourSection
+                    .padding(.top, 24)
+
+                beginBrewBlock
+                    .padding(.top, 24)
+                    .padding(.horizontal, 24)
+
+                Color.clear.frame(height: bottomScrollPadding)
+            }
+        }
+    }
+
+    private func wideLayout(width: CGFloat) -> some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                brewMasthead
+                    .frame(maxWidth: AppLayout.iPadContentMaxWidth)
+                    .frame(maxWidth: .infinity)
+
+                HStack(alignment: .top, spacing: AppLayout.iPadColumnSpacing) {
+                    VStack(spacing: 20) {
+                        roastSection
+                        doseSection
+                    }
+                    .frame(maxWidth: .infinity, alignment: .top)
+
+                    VStack(spacing: 24) {
+                        pourSection
+                        beginBrewBlock
+                    }
+                    .frame(width: AppLayout.brewResultColumnWidth(for: width), alignment: .top)
+                }
+                .frame(maxWidth: AppLayout.iPadContentMaxWidth, alignment: .top)
+                .padding(.horizontal, AppLayout.outerPadding(for: width))
+                .padding(.top, 24)
+
+                Color.clear.frame(height: bottomScrollPadding)
+            }
+        }
+    }
+
+    private var brewMasthead: some View {
+        Masthead(subtitle: "A calculator, set in type.") {
+            HStack(spacing: 0) {
+                Text("The ")
+                Text("Pour")
+                    .italic()
+                    .foregroundStyle(AppColors.accent(for: scheme))
+            }
+            .accessibilityIdentifier("brew.header.title")
+        }
+    }
+
+    private var roastSection: some View {
+        ZineSection(number: "01", title: "Choose your roast.", kicker: "Three options") {
+            RoastList(brewModel: brewModel)
+        }
+    }
+
+    private var doseSection: some View {
+        ZineSection(number: "02", title: "Dial in the dose.", kicker: "Grams") {
+            DoseInput(brewModel: brewModel)
+        }
+    }
+
+    private var pourSection: some View {
+        ZineSection(number: "03", title: "The pour, by weight.", kicker: "Computed") {
+            PourBlock(brewModel: brewModel)
+        }
+    }
+
+    private var beginBrewBlock: some View {
+        BeginBrewBlock(
+            brewModel: brewModel,
+            morningPreset: morningPreset,
+            onSaveMorningPreset: onSaveMorningPreset,
+            onStartBrew: onStartBrew
+        )
     }
 }
 
@@ -93,22 +154,25 @@ private struct RoastRow: View {
                     .padding(.vertical, 12)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(roast.displayName)
-                            .font(AppTypography.serif(18, weight: .medium))
-                            .foregroundStyle(ink)
-                            .kerning(-0.3)
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .firstTextBaseline) {
+                            roastName(color: ink)
+                            roastDescriptor(color: muted)
 
-                        Text("\u{2014} \(roast.shortDescriptor)")
-                            .font(AppTypography.serifItalic(11))
-                            .foregroundStyle(muted)
+                            Spacer(minLength: 8)
 
-                        Spacer(minLength: 8)
+                            ratioLabel(color: accent)
+                        }
 
-                        Text(roast.ratioLabel)
-                            .font(AppTypography.serifItalic(18, weight: .medium))
-                            .foregroundStyle(accent)
-                            .kerning(-0.5)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(alignment: .firstTextBaseline) {
+                                roastName(color: ink)
+                                Spacer(minLength: 8)
+                                ratioLabel(color: accent)
+                            }
+                            roastDescriptor(color: muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
 
                     Text(roast.flavorProfile)
@@ -135,6 +199,30 @@ private struct RoastRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(roast.displayName) roast, ratio \(roast.ratioLabel)")
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private func roastName(color: Color) -> some View {
+        Text(roast.displayName)
+            .font(AppTypography.serif(18, weight: .medium))
+            .foregroundStyle(color)
+            .kerning(-0.3)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+    }
+
+    private func roastDescriptor(color: Color) -> some View {
+        Text("\u{2014} \(roast.shortDescriptor)")
+            .font(AppTypography.serifItalic(11))
+            .foregroundStyle(color)
+    }
+
+    private func ratioLabel(color: Color) -> some View {
+        Text(roast.ratioLabel)
+            .font(AppTypography.serifItalic(18, weight: .medium))
+            .foregroundStyle(color)
+            .kerning(-0.5)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
     }
 }
 
@@ -444,6 +532,7 @@ private struct BeginBrewBlock: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Begin the brew. Switches to the Guide tab.")
+            .accessibilityIdentifier("brew.begin")
 
             SavePresetPill(
                 isSaved: presetMatchesCurrent,
@@ -494,6 +583,7 @@ private struct SavePresetPill: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(isSaved ? "Preset saved as my morning" : "Save as my morning preset")
+        .accessibilityIdentifier("brew.savePreset")
         .animation(.snappy, value: isSaved)
     }
 }

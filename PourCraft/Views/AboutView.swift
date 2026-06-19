@@ -5,22 +5,23 @@ import SwiftUI
 struct AboutView: View {
     @Bindable var brewModel: BrewModel
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.zineBottomScrollPadding) private var bottomScrollPadding
 
     var body: some View {
+        GeometryReader { proxy in
+            if AppLayout.usesWideLayout(width: proxy.size.width) {
+                wideLayout(width: proxy.size.width)
+            } else {
+                compactLayout
+            }
+        }
+        .background(AppColors.background(for: scheme))
+    }
+
+    private var compactLayout: some View {
         ScrollView {
             VStack(spacing: 0) {
-                SubHeader(
-                    kicker: "Colophon",
-                    subtitle: "A note on what this is, and who made it."
-                ) {
-                    HStack(spacing: 0) {
-                        Text("The ")
-                        Text("Colophon")
-                            .italic()
-                            .foregroundStyle(AppColors.accent(for: scheme))
-                        Text(".")
-                    }
-                }
+                aboutHeader
 
                 Manifesto()
                     .padding(.horizontal, 24)
@@ -46,10 +47,61 @@ struct AboutView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 32)
 
-                Color.clear.frame(height: 24)
+                Color.clear.frame(height: bottomScrollPadding)
             }
         }
-        .background(AppColors.background(for: scheme))
+    }
+
+    private func wideLayout(width: CGFloat) -> some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                aboutHeader
+                    .frame(maxWidth: AppLayout.iPadContentMaxWidth)
+                    .frame(maxWidth: .infinity)
+
+                HStack(alignment: .top, spacing: AppLayout.iPadColumnSpacing) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Manifesto()
+                            .padding(.top, 4)
+
+                        BodyParagraph()
+                            .padding(.top, 18)
+
+                        Footer()
+                            .padding(.top, 36)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+
+                    VStack(spacing: 28) {
+                        SettingsSection(brewModel: brewModel)
+                        ReadingRoomSection()
+                        MastheadSection()
+                    }
+                    .frame(width: AppLayout.aboutSecondaryColumnWidth(for: width), alignment: .top)
+                }
+                .frame(maxWidth: AppLayout.iPadContentMaxWidth, alignment: .top)
+                .padding(.horizontal, AppLayout.outerPadding(for: width))
+                .padding(.top, 28)
+
+                Color.clear.frame(height: bottomScrollPadding)
+            }
+        }
+    }
+
+    private var aboutHeader: some View {
+        SubHeader(
+            kicker: "Colophon",
+            subtitle: "A note on what this is, and who made it."
+        ) {
+            HStack(spacing: 0) {
+                Text("The ")
+                Text("Colophon")
+                    .italic()
+                    .foregroundStyle(AppColors.accent(for: scheme))
+                Text(".")
+            }
+            .accessibilityIdentifier("about.header.title")
+        }
     }
 }
 
@@ -191,7 +243,8 @@ private struct ReadingRoomSection: View {
             CafeCard(padding: 0) {
                 VStack(spacing: 0) {
                     ChevronRow(label: "Rate PourCraft") {
-                        let reviewURL = "https://apps.apple.com/us/app/pourcraft-coffee/id6759871953?action=write-review"
+                        let reviewURL = "https://apps.apple.com/us/app/pourcraft-coffee/" +
+                            "id6759871953?action=write-review"
                         if let url = URL(string: reviewURL) {
                             openURL(url)
                         }
@@ -267,7 +320,7 @@ private struct MastheadSection: View {
             Credit(role: "Created by", person: "Vinny Carpenter", url: URL(string: "https://vinny.dev")),
             Credit(role: "Inspired by", person: "Kristin Carpenter", url: nil),
             Credit(role: "Developer", person: "Katie Carpenter", url: nil),
-            Credit(role: "Type", person: "Fraunces & Inter", url: nil),
+            Credit(role: "Type", person: "Fraunces & Inter", url: nil)
         ]
     }
 
@@ -343,6 +396,7 @@ private struct LeaderDots: View {
             }
         }
         .frame(height: 12)
+        .accessibilityHidden(true)
     }
 }
 
