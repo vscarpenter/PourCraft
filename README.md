@@ -54,6 +54,20 @@ xcodebuild -project PourCraft.xcodeproj -scheme PourCraft \
 
 If your machine has a different simulator runtime installed, replace `OS=18.5` and the device name with one from `xcrun simctl list devices available`.
 
+## Versioning
+
+```bash
+# Set marketing version to 2.3.0 and increment the build number
+scripts/update-version.sh 2 3 0
+
+# Same update, then regenerate App Store screenshot assets
+scripts/update-version.sh 2.3.0 --screenshots
+```
+
+The script updates `project.yml`, increments `CURRENT_PROJECT_VERSION` from the
+highest build number found in `project.yml` or the generated Xcode project, and
+then runs `xcodegen generate` so Xcode sees the same version/build values.
+
 ## Project Structure
 
 ```

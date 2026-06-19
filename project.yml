@@ -8,6 +8,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: 52HVJ3VDSM
 
 targets:
   PourCraft:
@@ -19,8 +21,8 @@ targets:
       base:
         INFOPLIST_FILE: PourCraft/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.pourcraft.app
-        MARKETING_VERSION: "2.2.0"
-        CURRENT_PROJECT_VERSION: "12"
+        MARKETING_VERSION: "2.5.0"
+        CURRENT_PROJECT_VERSION: "14"
         GENERATE_INFOPLIST_FILE: false
         SWIFT_EMIT_LOC_STRINGS: "YES"
         TARGETED_DEVICE_FAMILY: "1,2"
