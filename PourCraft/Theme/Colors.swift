@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// Editorial Zine palette. Two adaptive sets — light cream paper and dark
-/// paper — plus derived helpers (rule, chip) that stay in lockstep with the
+/// Editorial Zine palette. Two adaptive sets -- warm cafe paper and dark
+/// paper -- plus derived helpers (rule, chip) that stay in lockstep with the
 /// scheme's accent.
 ///
 /// All values come from the design handoff (`design_handoff_pourcraft_zine`).
 /// Where the handoff and earlier Swift values disagreed, the handoff wins.
 enum AppColors {
-    // MARK: - Light Mode (cream paper)
+    // MARK: - Light Mode (warm cafe paper)
 
     static let lightBackground = Color(hex: "FBF3E5")
     static let lightSurface = Color(hex: "FFF8EC")
@@ -32,8 +32,8 @@ enum AppColors {
 
     // MARK: - Phase / semantic accents (kept for the timer ring)
 
-    static let bloomOrange = Color(hex: "D4854A")
-    static let sageBrew = Color(hex: "7A9E7E")
+    static let bloomOrange = Color(hex: "C5794F")
+    static let sageBrew = Color(hex: "7F9B78")
 
     // MARK: - Adaptive helpers
 
@@ -71,7 +71,7 @@ enum AppColors {
     }
 
     static func rule(for scheme: ColorScheme) -> Color {
-        ink(for: scheme).opacity(0.18)
+        ink(for: scheme).opacity(scheme == .dark ? 0.20 : 0.18)
     }
 
     /// Heavy hairline used for the masthead's ink bar and the article footer.

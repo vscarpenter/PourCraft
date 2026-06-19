@@ -5,6 +5,7 @@ struct PourCraftApp: App {
     @State private var brewModel = BrewModel()
     @State private var timerModel = BrewTimerModel()
     @State private var selectedTab: ZineTab = .brew
+    @State private var selectedTip: BrewTip = BrewTip.allTips[0]
 
     @AppStorage("selectedRoast") private var savedRoast: String = Roast.medium.rawValue
     @AppStorage("temperatureUnit") private var savedTempUnit: String = TemperatureUnit.fahrenheit.rawValue
@@ -17,14 +18,16 @@ struct PourCraftApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ZStack(alignment: .bottom) {
-                AppColors.background(for: colorScheme)
-                    .ignoresSafeArea()
+            GeometryReader { proxy in
+                let usesWideLayout = AppLayout.usesWideLayout(width: proxy.size.width)
 
-                content
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
-                        ZineTabBar(selection: $selectedTab)
+                Group {
+                    if usesWideLayout {
+                        iPadShell(width: proxy.size.width)
+                    } else {
+                        iPhoneShell
                     }
+                }
             }
             .preferredColorScheme(nil) // honor system; explicit for clarity
             .onAppear {
@@ -52,19 +55,75 @@ struct PourCraftApp: App {
         }
     }
 
-    @ViewBuilder
-    private var content: some View {
-        switch selectedTab {
-        case .brew:
-            BrewView(brewModel: brewModel) {
-                withAnimation(.snappy) { selectedTab = .guide }
+    private var iPhoneShell: some View {
+        ZStack(alignment: .bottom) {
+            AppColors.background(for: colorScheme)
+                .ignoresSafeArea()
+
+            tabContent
+                .environment(\.zineBottomScrollPadding, AppLayout.bottomScrollPadding)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    ZineTabBar(selection: $selectedTab)
+                }
+
+            GeometryReader { proxy in
+                AppColors.background(for: colorScheme)
+                    .frame(height: proxy.safeAreaInsets.top)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .ignoresSafeArea(edges: .top)
+                    .allowsHitTesting(false)
             }
-        case .guide:
-            GuideView(brewModel: brewModel, timerModel: timerModel)
-        case .tips:
-            TipsView()
-        case .about:
-            AboutView(brewModel: brewModel)
         }
+    }
+
+    private func iPadShell(width: CGFloat) -> some View {
+        HStack(spacing: 0) {
+            ZineSidebar(selection: $selectedTab)
+                .frame(width: AppLayout.sidebarWidth(for: width))
+
+            Rectangle()
+                .fill(AppColors.rule(for: colorScheme))
+                .frame(width: 1)
+                .ignoresSafeArea(edges: .vertical)
+
+            tabContent
+                .environment(\.zineBottomScrollPadding, AppLayout.iPadScrollPadding)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .background(AppColors.background(for: colorScheme).ignoresSafeArea())
+    }
+
+    private var tabContent: some View {
+        Group {
+            switch selectedTab {
+            case .brew:
+                BrewView(
+                    brewModel: brewModel,
+                    morningPreset: morningPreset,
+                    onSaveMorningPreset: saveMorningPreset
+                ) {
+                    withAnimation(.snappy) { selectedTab = .guide }
+                }
+            case .guide:
+                GuideView(brewModel: brewModel, timerModel: timerModel)
+            case .tips:
+                TipsView(selectedTip: $selectedTip)
+            case .about:
+                AboutView(brewModel: brewModel)
+            }
+        }
+        .animation(.snappy, value: selectedTab)
+    }
+
+    private var morningPreset: BrewPreset? {
+        guard savedPresetWeight > 0, let roast = Roast(rawValue: savedPresetRoast) else {
+            return nil
+        }
+        return BrewPreset(roast: roast, coffeeWeight: savedPresetWeight)
+    }
+
+    private func saveMorningPreset() {
+        savedPresetRoast = brewModel.selectedRoast.rawValue
+        savedPresetWeight = brewModel.coffeeWeight
     }
 }

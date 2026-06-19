@@ -48,7 +48,7 @@ struct AppColorsTests {
 
     // MARK: - Mapped values match palette tokens
 
-    @Test("Should map light mode background to the cream paper token")
+    @Test("Should map light mode background to the warm cafe paper token")
     func shouldUseLightBackgroundToken() {
         #expect(!colorsAreDifferent(AppColors.background(for: .light), AppColors.lightBackground))
     }
@@ -58,7 +58,7 @@ struct AppColorsTests {
         #expect(!colorsAreDifferent(AppColors.background(for: .dark), AppColors.darkBackground))
     }
 
-    @Test("Should map accent to copper in light and burnished copper in dark")
+    @Test("Should map accent to terracotta in light and warm copper in dark")
     func shouldUseExpectedAccentTokens() {
         #expect(!colorsAreDifferent(AppColors.accent(for: .light), AppColors.lightAccent))
         #expect(!colorsAreDifferent(AppColors.accent(for: .dark), AppColors.darkAccent))

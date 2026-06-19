@@ -19,10 +19,11 @@ targets:
       base:
         INFOPLIST_FILE: PourCraft/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.pourcraft.app
-        MARKETING_VERSION: "2.1.0"
-        CURRENT_PROJECT_VERSION: "9"
+        MARKETING_VERSION: "2.2.0"
+        CURRENT_PROJECT_VERSION: "12"
         GENERATE_INFOPLIST_FILE: false
         SWIFT_EMIT_LOC_STRINGS: "YES"
+        TARGETED_DEVICE_FAMILY: "1,2"
     info:
       path: PourCraft/Info.plist
       properties:
@@ -57,12 +58,26 @@ targets:
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/PourCraft.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PourCraft"
         BUNDLE_LOADER: "$(TEST_HOST)"
 
+  PourCraftUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: PourCraftUITests
+    dependencies:
+      - target: PourCraft
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: true
+        PRODUCT_BUNDLE_IDENTIFIER: com.pourcraft.uitests
+
 schemes:
   PourCraft:
     build:
       targets:
         PourCraft: all
         PourCraftTests: [test]
+        PourCraftUITests: [test]
     test:
       targets:
         - PourCraftTests
+        - PourCraftUITests

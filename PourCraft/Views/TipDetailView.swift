@@ -1,18 +1,31 @@
 import SwiftUI
 
-/// Tip article view — magazine spread for a single field-note. 110pt copper
+/// Tip article view — magazine spread for a single field-note. 110pt terracotta
 /// numeral hero, left-aligned body paragraphs, pull-quote between paragraphs
 /// 1 and 2, "by the numbers" reference block, and either a "Continued in"
 /// link or, on the final tip, an "end of contents" CTA back to Field Notes.
 struct TipDetailView: View {
     let tip: BrewTip
+    let showsBackButton: Bool
+    let onSelectTip: ((BrewTip) -> Void)?
+
     @Environment(\.colorScheme) private var scheme
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.zineBottomScrollPadding) private var bottomScrollPadding
+
+    init(
+        tip: BrewTip,
+        showsBackButton: Bool = true,
+        onSelectTip: ((BrewTip) -> Void)? = nil
+    ) {
+        self.tip = tip
+        self.showsBackButton = showsBackButton
+        self.onSelectTip = onSelectTip
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                ArticleHeader(tip: tip)
+                ArticleHeader(tip: tip, showsBackButton: showsBackButton)
                     .padding(.horizontal, 24)
                     .padding(.top, 4)
 
@@ -29,20 +42,23 @@ struct TipDetailView: View {
                     .padding(.top, 8)
 
                 if tip.isLast {
-                    EndOfContents()
+                    EndOfContents(onSelectTip: onSelectTip)
                         .padding(.horizontal, 24)
                         .padding(.top, 24)
                 } else {
-                    NextTipLink(tip: tip)
+                    NextTipLink(tip: tip, onSelectTip: onSelectTip)
                         .padding(.horizontal, 24)
                         .padding(.top, 24)
                 }
 
-                Color.clear.frame(height: 24)
+                Color.clear.frame(height: bottomScrollPadding)
             }
+            .frame(maxWidth: AppLayout.iPadArticleMaxWidth, alignment: .leading)
+            .frame(maxWidth: .infinity)
         }
         .background(AppColors.background(for: scheme))
         .navigationBarBackButtonHidden(true)
+        .accessibilityIdentifier("article.\(tip.id)")
     }
 }
 
@@ -50,6 +66,7 @@ struct TipDetailView: View {
 
 private struct ArticleHeader: View {
     let tip: BrewTip
+    let showsBackButton: Bool
     @Environment(\.colorScheme) private var scheme
     @Environment(\.dismiss) private var dismiss
 
@@ -58,14 +75,19 @@ private struct ArticleHeader: View {
 
         VStack(spacing: 10) {
             HStack {
-                Button(action: { dismiss() }) {
-                    HStack(spacing: 4) {
-                        InkIconView(icon: .chevron, size: 11, color: muted, strokeWidth: 1.6)
-                            .rotationEffect(.degrees(180))
-                        Text("Field Notes")
-                    }
+                if showsBackButton {
+                    Button(action: { dismiss() }, label: {
+                        HStack(spacing: 4) {
+                            InkIconView(icon: .chevron, size: 11, color: muted, strokeWidth: 1.6)
+                                .rotationEffect(.degrees(180))
+                            Text("Field Notes")
+                        }
+                    })
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Back to Field Notes")
+                } else {
+                    Text("Field Notes")
                 }
-                .buttonStyle(.plain)
                 Spacer()
                 Text("Nº \(tip.numberLabel)")
                 Spacer()
@@ -113,6 +135,7 @@ private struct BigNumeralHero: View {
                 .kerning(-1.5)
                 .lineSpacing(-2)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("article.title.\(tip.id)")
             Text(tip.dek)
                 .font(AppTypography.serifItalic(17))
                 .foregroundStyle(muted)
@@ -207,29 +230,30 @@ private struct ReferencesBlock: View {
                 .textCase(.uppercase)
                 .foregroundStyle(muted)
 
-            VStack(spacing: 0) {
-                ForEach(Array(tip.references.enumerated()), id: \.offset) { index, ref in
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(ref.key)
-                            .font(AppTypography.micro)
-                            .tracking(2)
-                            .textCase(.uppercase)
-                            .foregroundStyle(muted)
-                        Spacer()
-                        Text(ref.value)
-                            .font(AppTypography.serif(17, weight: .medium))
-                            .foregroundStyle(ink)
-                            .kerning(-0.3)
-                    }
-                    .padding(.vertical, 12)
-                    if index < tip.references.count - 1 {
-                        Rule(color: AppColors.rule(for: scheme), opacity: 0.6)
+            CafeCard(padding: 0) {
+                VStack(spacing: 0) {
+                    ForEach(Array(tip.references.enumerated()), id: \.offset) { index, ref in
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(ref.key)
+                                .font(AppTypography.micro)
+                                .tracking(2)
+                                .textCase(.uppercase)
+                                .foregroundStyle(muted)
+                            Spacer()
+                            Text(ref.value)
+                                .font(AppTypography.serif(17, weight: .medium))
+                                .foregroundStyle(ink)
+                                .kerning(-0.3)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        if index < tip.references.count - 1 {
+                            Rule(color: AppColors.rule(for: scheme), opacity: 0.6)
+                                .padding(.horizontal, 16)
+                        }
                     }
                 }
             }
-            .padding(.horizontal, 16)
-            .background(AppColors.surface(for: scheme))
-            .overlay(Rectangle().stroke(AppColors.rule(for: scheme), lineWidth: 1))
         }
     }
 }
@@ -238,49 +262,68 @@ private struct ReferencesBlock: View {
 
 private struct NextTipLink: View {
     let tip: BrewTip
+    let onSelectTip: ((BrewTip) -> Void)?
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        let muted = AppColors.muted(for: scheme)
-        let accent = AppColors.accent(for: scheme)
         let next = tip.nextTip
-        let nextHook = next.title.split(separator: ".").first.map(String.init) ?? next.title
 
-        VStack(spacing: 0) {
-            Rectangle()
-                .fill(AppColors.ruleStrong(for: scheme))
-                .frame(height: 2)
-            Rectangle()
-                .fill(AppColors.ruleStrong(for: scheme))
-                .frame(height: 1)
-                .padding(.top, 2)
-
-            NavigationLink(value: next) {
-                HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Continued in")
-                            .font(AppTypography.micro)
-                            .tracking(2.5)
-                            .textCase(.uppercase)
-                            .foregroundStyle(muted)
-                        Text("Nº \(next.numberLabel) \u{2014} \(nextHook)")
-                            .font(AppTypography.serifItalic(18))
-                            .foregroundStyle(accent)
-                            .multilineTextAlignment(.leading)
+        VStack(spacing: 10) {
+            Group {
+                if let onSelectTip {
+                    Button {
+                        onSelectTip(next)
+                    } label: {
+                        linkLabel(for: next)
                     }
-                    Spacer()
-                    InkIconView(icon: .chevron, size: 16, color: accent, strokeWidth: 1.8)
+                } else {
+                    NavigationLink(value: next) {
+                        linkLabel(for: next)
+                    }
                 }
-                .padding(.top, 18)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("article.next")
         }
+    }
+
+    private func linkLabel(for next: BrewTip) -> some View {
+        let muted = AppColors.muted(for: scheme)
+        let accent = AppColors.accent(for: scheme)
+        let nextHook = next.title.split(separator: ".").first.map(String.init) ?? next.title
+
+        return HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Continued in")
+                    .font(AppTypography.micro)
+                    .tracking(2.5)
+                    .textCase(.uppercase)
+                    .foregroundStyle(muted)
+                Text("Nº \(next.numberLabel) \u{2014} \(nextHook)")
+                    .font(AppTypography.serifItalic(18))
+                    .foregroundStyle(accent)
+                    .multilineTextAlignment(.leading)
+            }
+            Spacer()
+            InkIconView(icon: .chevron, size: 16, color: accent, strokeWidth: 1.8)
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: AppCorners.card, style: .continuous)
+                .fill(AppColors.surface(for: scheme))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppCorners.card, style: .continuous)
+                .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+        )
     }
 }
 
 // MARK: - End-of-contents footer (final tip only)
 
 private struct EndOfContents: View {
+    let onSelectTip: ((BrewTip) -> Void)?
+
     @Environment(\.colorScheme) private var scheme
     @Environment(\.dismiss) private var dismiss
 
@@ -302,7 +345,7 @@ private struct EndOfContents: View {
                 .foregroundStyle(muted)
                 .padding(.top, 4)
 
-            Button(action: { dismiss() }) {
+            Button(action: handleTap) {
                 HStack(spacing: 8) {
                     InkIconView(icon: .chevron, size: 12, color: accent, strokeWidth: 1.8)
                         .rotationEffect(.degrees(180))
@@ -311,10 +354,29 @@ private struct EndOfContents: View {
                         .foregroundStyle(accent)
                         .kerning(-0.2)
                 }
+                .padding(.vertical, 10)
+                .padding(.horizontal, 16)
+                .background(
+                    Capsule()
+                        .fill(AppColors.surface(for: scheme))
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+                )
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Back to Field Notes")
+            .accessibilityIdentifier("article.backToContents")
         }
         .frame(maxWidth: .infinity)
+    }
+
+    private func handleTap() {
+        if let onSelectTip {
+            onSelectTip(BrewTip.allTips[0])
+        } else {
+            dismiss()
+        }
     }
 }

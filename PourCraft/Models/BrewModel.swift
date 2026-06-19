@@ -110,6 +110,17 @@ final class BrewModel {
     }
 }
 
+// MARK: - BrewPreset
+
+struct BrewPreset: Equatable {
+    let roast: Roast
+    let coffeeWeight: Double
+
+    func matches(roast currentRoast: Roast, coffeeWeight currentWeight: Double) -> Bool {
+        roast == currentRoast && Int(coffeeWeight) == Int(currentWeight)
+    }
+}
+
 // MARK: - TemperatureUnit
 
 enum TemperatureUnit: String, CaseIterable, Codable {
@@ -123,4 +134,3 @@ enum TemperatureUnit: String, CaseIterable, Codable {
         }
     }
 }
-

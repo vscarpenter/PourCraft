@@ -5,22 +5,23 @@ import SwiftUI
 struct AboutView: View {
     @Bindable var brewModel: BrewModel
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.zineBottomScrollPadding) private var bottomScrollPadding
 
     var body: some View {
+        GeometryReader { proxy in
+            if AppLayout.usesWideLayout(width: proxy.size.width) {
+                wideLayout(width: proxy.size.width)
+            } else {
+                compactLayout
+            }
+        }
+        .background(AppColors.background(for: scheme))
+    }
+
+    private var compactLayout: some View {
         ScrollView {
             VStack(spacing: 0) {
-                SubHeader(
-                    kicker: "Colophon",
-                    subtitle: "A note on what this is, and who made it."
-                ) {
-                    HStack(spacing: 0) {
-                        Text("The ")
-                        Text("Colophon")
-                            .italic()
-                            .foregroundStyle(AppColors.accent(for: scheme))
-                        Text(".")
-                    }
-                }
+                aboutHeader
 
                 Manifesto()
                     .padding(.horizontal, 24)
@@ -46,10 +47,61 @@ struct AboutView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 32)
 
-                Color.clear.frame(height: 24)
+                Color.clear.frame(height: bottomScrollPadding)
             }
         }
-        .background(AppColors.background(for: scheme))
+    }
+
+    private func wideLayout(width: CGFloat) -> some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                aboutHeader
+                    .frame(maxWidth: AppLayout.iPadContentMaxWidth)
+                    .frame(maxWidth: .infinity)
+
+                HStack(alignment: .top, spacing: AppLayout.iPadColumnSpacing) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Manifesto()
+                            .padding(.top, 4)
+
+                        BodyParagraph()
+                            .padding(.top, 18)
+
+                        Footer()
+                            .padding(.top, 36)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+
+                    VStack(spacing: 28) {
+                        SettingsSection(brewModel: brewModel)
+                        ReadingRoomSection()
+                        MastheadSection()
+                    }
+                    .frame(width: AppLayout.aboutSecondaryColumnWidth(for: width), alignment: .top)
+                }
+                .frame(maxWidth: AppLayout.iPadContentMaxWidth, alignment: .top)
+                .padding(.horizontal, AppLayout.outerPadding(for: width))
+                .padding(.top, 28)
+
+                Color.clear.frame(height: bottomScrollPadding)
+            }
+        }
+    }
+
+    private var aboutHeader: some View {
+        SubHeader(
+            kicker: "Colophon",
+            subtitle: "A note on what this is, and who made it."
+        ) {
+            HStack(spacing: 0) {
+                Text("The ")
+                Text("Colophon")
+                    .italic()
+                    .foregroundStyle(AppColors.accent(for: scheme))
+                Text(".")
+            }
+            .accessibilityIdentifier("about.header.title")
+        }
     }
 }
 
@@ -90,20 +142,22 @@ private struct SettingsSection: View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeader(number: "01", kicker: "Settings")
 
-            VStack(spacing: 0) {
-                SettingRow(label: "Display temperature in") {
-                    UnitSegmentToggle(brewModel: brewModel)
+            CafeCard(padding: 0) {
+                VStack(spacing: 0) {
+                    SettingRow(label: "Display temperature in") {
+                        TemperatureUnitPicker(selection: $brewModel.temperatureUnit)
+                    }
+                    ToggleSettingRow(
+                        label: "Haptic feedback",
+                        accessibilityHint: "Plays a tap on each brew-phase change",
+                        isOn: $brewModel.hapticsEnabled
+                    )
+                    ToggleSettingRow(
+                        label: "Auto-advance brew steps",
+                        accessibilityHint: "Highlights the step matching the live timer phase",
+                        isOn: $brewModel.autoAdvanceSteps
+                    )
                 }
-                ToggleSettingRow(
-                    label: "Haptic feedback",
-                    accessibilityHint: "Plays a tap on each brew-phase change",
-                    isOn: $brewModel.hapticsEnabled
-                )
-                ToggleSettingRow(
-                    label: "Auto-advance brew steps",
-                    accessibilityHint: "Highlights the step matching the live timer phase",
-                    isOn: $brewModel.autoAdvanceSteps
-                )
             }
         }
     }
@@ -124,13 +178,15 @@ private struct SettingRow<Trailing: View>: View {
                 trailing()
             }
             .padding(.vertical, 12)
+            .padding(.horizontal, 16)
             .frame(minHeight: 44)
             Rule(color: AppColors.rule(for: scheme))
+                .padding(.horizontal, 16)
         }
     }
 }
 
-/// Tappable row whose trailing label flips between italic copper "On" / muted "Off".
+/// Tappable row whose trailing label flips between italic terracotta "On" / muted "Off".
 /// The whole row is the hit target so it matches the 44pt zine row spec.
 private struct ToggleSettingRow: View {
     let label: String
@@ -159,6 +215,7 @@ private struct ToggleSettingRow: View {
                         .animation(.snappy, value: isOn)
                 }
                 .padding(.vertical, 12)
+                .padding(.horizontal, 16)
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
             }
@@ -169,47 +226,7 @@ private struct ToggleSettingRow: View {
             .accessibilityAddTraits(.isButton)
 
             Rule(color: AppColors.rule(for: scheme))
-        }
-    }
-}
-
-private struct UnitSegmentToggle: View {
-    @Bindable var brewModel: BrewModel
-    @Environment(\.colorScheme) private var scheme
-
-    var body: some View {
-        let ink = AppColors.ink(for: scheme)
-        let bg = AppColors.background(for: scheme)
-
-        HStack(spacing: 0) {
-            ForEach(TemperatureUnit.allCases, id: \.self) { unit in
-                let selected = brewModel.temperatureUnit == unit
-                Button {
-                    brewModel.temperatureUnit = unit
-                } label: {
-                    Text(unit.shortLabel)
-                        .font(AppTypography.sans(.caption, weight: .semibold))
-                        .tracking(1)
-                        .foregroundStyle(selected ? bg : ink)
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, 14)
-                        .background(selected ? ink : .clear)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(unit == .fahrenheit ? "Fahrenheit" : "Celsius")
-                .accessibilityAddTraits(selected ? .isSelected : [])
-            }
-        }
-        .overlay(Capsule().stroke(ink, lineWidth: 1))
-        .clipShape(Capsule())
-    }
-}
-
-private extension TemperatureUnit {
-    var shortLabel: String {
-        switch self {
-        case .fahrenheit: "\u{00B0}F"
-        case .celsius: "\u{00B0}C"
+                .padding(.horizontal, 16)
         }
     }
 }
@@ -223,26 +240,29 @@ private struct ReadingRoomSection: View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeader(number: "02", kicker: "The Reading Room")
 
-            VStack(spacing: 0) {
-                ChevronRow(label: "Rate PourCraft") {
-                    let reviewURL = "https://apps.apple.com/us/app/pourcraft-coffee/id6759871953?action=write-review"
-                    if let url = URL(string: reviewURL) {
-                        openURL(url)
+            CafeCard(padding: 0) {
+                VStack(spacing: 0) {
+                    ChevronRow(label: "Rate PourCraft") {
+                        let reviewURL = "https://apps.apple.com/us/app/pourcraft-coffee/" +
+                            "id6759871953?action=write-review"
+                        if let url = URL(string: reviewURL) {
+                            openURL(url)
+                        }
                     }
-                }
-                ChevronRow(label: "Share with a friend") {
-                    if let url = URL(string: "https://www.pourcraftcoffee.com/") {
-                        openURL(url)
+                    ChevronRow(label: "Share with a friend") {
+                        if let url = URL(string: "https://www.pourcraftcoffee.com/") {
+                            openURL(url)
+                        }
                     }
-                }
-                ChevronRow(label: "Send feedback") {
-                    if let url = URL(string: "mailto:pourcraftcoffee@vinny.dev?subject=PourCraft%20feedback") {
-                        openURL(url)
+                    ChevronRow(label: "Send feedback") {
+                        if let url = URL(string: "mailto:pourcraftcoffee@vinny.dev?subject=PourCraft%20feedback") {
+                            openURL(url)
+                        }
                     }
-                }
-                ChevronRow(label: "Privacy policy") {
-                    if let url = URL(string: "https://www.pourcraftcoffee.com/privacy.html") {
-                        openURL(url)
+                    ChevronRow(label: "Privacy policy") {
+                        if let url = URL(string: "https://www.pourcraftcoffee.com/privacy.html") {
+                            openURL(url)
+                        }
                     }
                 }
             }
@@ -269,11 +289,13 @@ private struct ChevronRow: View {
                     InkIconView(icon: .chevron, size: 14, color: muted, strokeWidth: 1.6)
                 }
                 .padding(.vertical, 14)
+                .padding(.horizontal, 16)
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             Rule(color: AppColors.rule(for: scheme))
+                .padding(.horizontal, 16)
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
@@ -286,10 +308,11 @@ private struct MastheadSection: View {
     @Environment(\.openURL) private var openURL
 
     fileprivate struct Credit: Identifiable {
-        let id = UUID()
         let role: String
         let person: String
         let url: URL?
+
+        var id: String { "\(role)-\(person)" }
     }
 
     private var credits: [Credit] {
@@ -297,16 +320,18 @@ private struct MastheadSection: View {
             Credit(role: "Created by", person: "Vinny Carpenter", url: URL(string: "https://vinny.dev")),
             Credit(role: "Inspired by", person: "Kristin Carpenter", url: nil),
             Credit(role: "Developer", person: "Katie Carpenter", url: nil),
-            Credit(role: "Type", person: "Fraunces & Inter", url: nil),
+            Credit(role: "Type", person: "Fraunces & Inter", url: nil)
         ]
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeader(number: "03", kicker: "Masthead")
-            VStack(spacing: 0) {
-                ForEach(credits) { credit in
-                    CreditRow(credit: credit, openURL: openURL)
+            CafeCard(padding: 0) {
+                VStack(spacing: 0) {
+                    ForEach(credits) { credit in
+                        CreditRow(credit: credit, openURL: openURL)
+                    }
                 }
             }
         }
@@ -348,8 +373,10 @@ private struct CreditRow: View {
                 }
             }
             .padding(.vertical, 10)
+            .padding(.horizontal, 16)
             .frame(minHeight: 44)
             Rule(color: AppColors.rule(for: scheme), opacity: 0.6)
+                .padding(.horizontal, 16)
         }
     }
 }
@@ -369,6 +396,7 @@ private struct LeaderDots: View {
             }
         }
         .frame(height: 12)
+        .accessibilityHidden(true)
     }
 }
 

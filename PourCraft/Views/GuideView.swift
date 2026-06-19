@@ -9,23 +9,56 @@ struct GuideView: View {
 
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.zineBottomScrollPadding) private var bottomScrollPadding
     @State private var manuallyExpanded: Int?
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                SubHeader(
-                    kicker: "The Method",
-                    subtitle: "Eight steps, in order, by the gram."
-                ) {
-                    HStack(spacing: 0) {
-                        Text("The ")
-                        Text("Method")
-                            .italic()
-                            .foregroundStyle(AppColors.accent(for: scheme))
-                        Text(".")
+        GeometryReader { geometry in
+            let usesWideLayout = AppLayout.usesWideLayout(width: geometry.size.width)
+
+            ScrollViewReader { proxy in
+                Group {
+                    if usesWideLayout {
+                        wideLayout(width: geometry.size.width)
+                    } else {
+                        compactLayout
                     }
                 }
+                .background(AppColors.background(for: scheme))
+                .sensoryFeedback(trigger: timerModel.phase) { oldValue, newValue in
+                    guard brewModel.hapticsEnabled, oldValue != newValue else { return nil }
+                    switch newValue {
+                    case .bloom, .pour, .drawdown: return .impact(weight: .medium)
+                    case .done: return .success
+                    case .ready: return nil
+                    }
+                }
+                .onAppear {
+                    syncTimerIfReady()
+                    timerModel.syncToNow()
+                    scrollToTimerStep(
+                        with: proxy,
+                        animated: false,
+                        anchor: usesWideLayout ? .center : .bottom
+                    )
+                }
+                .onChange(of: timerModel.phase) { _, _ in
+                    scrollToTimerStep(with: proxy, anchor: usesWideLayout ? .center : .bottom)
+                }
+                .onChange(of: brewModel.autoAdvanceSteps) { _, _ in
+                    scrollToTimerStep(with: proxy, anchor: usesWideLayout ? .center : .bottom)
+                }
+                .onChange(of: brewModel.coffeeWeight) { _, _ in syncTimerIfReady() }
+                .onChange(of: brewModel.selectedRoast) { _, _ in syncTimerIfReady() }
+                .onChange(of: scenePhase) { _, _ in timerModel.syncToNow() }
+            }
+        }
+    }
+
+    private var compactLayout: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                guideHeader
 
                 RecipeSummaryStrip(brewModel: brewModel)
                     .padding(.horizontal, 24)
@@ -46,25 +79,89 @@ struct GuideView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 28)
 
-                Color.clear.frame(height: 24)
+                Color.clear.frame(height: bottomScrollPadding)
             }
         }
-        .background(AppColors.background(for: scheme))
-        .sensoryFeedback(trigger: timerModel.phase) { oldValue, newValue in
-            guard brewModel.hapticsEnabled, oldValue != newValue else { return nil }
-            switch newValue {
-            case .bloom, .pour, .drawdown: return .impact(weight: .medium)
-            case .done: return .success
-            case .ready: return nil
+    }
+
+    private func wideLayout(width: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            guideHeader
+                .frame(maxWidth: AppLayout.iPadContentMaxWidth)
+                .frame(maxWidth: .infinity)
+
+            HStack(alignment: .top, spacing: AppLayout.iPadColumnSpacing) {
+                ScrollView {
+                    guideSidePanel
+                        .padding(.bottom, bottomScrollPadding)
+                }
+                .scrollIndicators(.hidden)
+                .frame(width: AppLayout.guideSidePanelWidth(for: width))
+
+                ScrollView {
+                    StepsSection(
+                        brewModel: brewModel,
+                        timerModel: timerModel,
+                        manuallyExpanded: $manuallyExpanded,
+                        horizontalPadding: 0
+                    )
+                    .padding(.top, 0)
+
+                    Color.clear.frame(height: bottomScrollPadding)
+                }
             }
+            .frame(maxWidth: AppLayout.iPadContentMaxWidth, maxHeight: .infinity, alignment: .top)
+            .padding(.horizontal, AppLayout.outerPadding(for: width))
+            .padding(.top, 24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .onAppear {
-            syncTimerIfReady()
-            timerModel.syncToNow()
+    }
+
+    private var guideHeader: some View {
+        SubHeader(
+            kicker: "The Method",
+            subtitle: "Eight steps, in order, by the gram."
+        ) {
+            HStack(spacing: 0) {
+                Text("The ")
+                Text("Method")
+                    .italic()
+                    .foregroundStyle(AppColors.accent(for: scheme))
+                Text(".")
+            }
+            .accessibilityIdentifier("guide.header.title")
         }
-        .onChange(of: brewModel.coffeeWeight) { _, _ in syncTimerIfReady() }
-        .onChange(of: brewModel.selectedRoast) { _, _ in syncTimerIfReady() }
-        .onChange(of: scenePhase) { _, _ in timerModel.syncToNow() }
+    }
+
+    private var guideSidePanel: some View {
+        VStack(spacing: 16) {
+            RecipeSummaryStrip(brewModel: brewModel)
+            TimerStrip(timerModel: timerModel, brewModel: brewModel)
+            OutroQuote()
+                .padding(.top, 10)
+        }
+    }
+
+    private func scrollToTimerStep(
+        with proxy: ScrollViewProxy,
+        animated: Bool = true,
+        anchor: UnitPoint = .bottom
+    ) {
+        guard brewModel.autoAdvanceSteps,
+              manuallyExpanded == nil,
+              let stepId = timerModel.phase.guideStepId else {
+            return
+        }
+
+        let scroll = {
+            proxy.scrollTo(stepId, anchor: anchor)
+        }
+
+        if animated {
+            withAnimation(.snappy) { scroll() }
+        } else {
+            scroll()
+        }
     }
 
     private func syncTimerIfReady() {
@@ -77,6 +174,18 @@ struct GuideView: View {
     }
 }
 
+private extension BrewPhase {
+    var guideStepId: Int? {
+        switch self {
+        case .ready: nil
+        case .bloom: 4
+        case .pour: 6
+        case .drawdown: 7
+        case .done: 8
+        }
+    }
+}
+
 // MARK: - Recipe summary strip
 
 private struct RecipeSummaryStrip: View {
@@ -86,8 +195,7 @@ private struct RecipeSummaryStrip: View {
     var body: some View {
         let muted = AppColors.muted(for: scheme)
 
-        VStack(spacing: 0) {
-            Rule(color: AppColors.rule(for: scheme))
+        CafeCard(padding: 14) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("Today's Recipe")
@@ -107,8 +215,6 @@ private struct RecipeSummaryStrip: View {
                     SummaryCell(key: "Temp", value: brewModel.temperaturePoint)
                 }
             }
-            .padding(.vertical, 13)
-            Rule(color: AppColors.rule(for: scheme))
         }
     }
 }
@@ -149,8 +255,7 @@ private struct TimerStrip: View {
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
 
-        VStack(spacing: 0) {
-            Rule(color: AppColors.rule(for: scheme))
+        CafeCard(padding: 14) {
             VStack(spacing: 12) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -159,6 +264,7 @@ private struct TimerStrip: View {
                             .tracking(2.5)
                             .textCase(.uppercase)
                             .foregroundStyle(muted)
+                            .accessibilityIdentifier("guide.timer.title")
                         Text(timerModel.totalElapsedFormatted)
                             .font(AppTypography.serif(34, weight: .medium))
                             .foregroundStyle(ink)
@@ -166,6 +272,7 @@ private struct TimerStrip: View {
                             .monospacedDigit()
                             .contentTransition(.numericText())
                             .animation(.snappy, value: timerModel.elapsedSeconds)
+                            .accessibilityIdentifier("guide.timer.elapsed")
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 2) {
@@ -174,25 +281,45 @@ private struct TimerStrip: View {
                             .tracking(2.5)
                             .textCase(.uppercase)
                             .foregroundStyle(timerModel.phase == .ready ? muted : accent)
+                            .accessibilityIdentifier("guide.timer.phase")
                         Text("of \(timerModel.targetTimeFormatted)")
                             .font(AppTypography.serifItalic(13))
                             .foregroundStyle(muted)
+                            .accessibilityIdentifier("guide.timer.target")
                     }
                 }
 
                 // Progress rule
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Rectangle()
+                        Capsule()
                             .fill(AppColors.rule(for: scheme))
-                            .frame(height: 2)
-                        Rectangle()
+                            .frame(height: 4)
+                        Capsule()
                             .fill(accent)
-                            .frame(width: max(0, geo.size.width * timerModel.progress), height: 2)
+                            .frame(width: max(0, geo.size.width * timerModel.progress), height: 4)
                             .animation(.linear(duration: 1), value: timerModel.progress)
                     }
                 }
-                .frame(height: 2)
+                .frame(height: 4)
+
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(timerModel.phase == .ready ? "Ready" : "Now")
+                        .font(AppTypography.micro)
+                        .tracking(2)
+                        .textCase(.uppercase)
+                        .foregroundStyle(timerModel.phase == .ready ? muted : accent)
+                        .zineChromeLine(minimumScaleFactor: 0.7)
+
+                    Text(timerModel.phaseInstruction)
+                        .font(AppTypography.serifItalic(13))
+                        .foregroundStyle(muted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Spacer(minLength: 0)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("guide.timer.instruction")
 
                 HStack(spacing: 12) {
                     if timerModel.phase != .ready {
@@ -206,10 +333,9 @@ private struct TimerStrip: View {
                     }
                     .buttonStyle(SolidButtonStyle())
                     .disabled(timerModel.phase == .done)
+                    .accessibilityIdentifier("guide.timer.primary")
                 }
             }
-            .padding(.vertical, 14)
-            Rule(color: AppColors.rule(for: scheme))
         }
     }
 
@@ -256,7 +382,10 @@ private struct SolidButtonStyle: ButtonStyle {
             .foregroundStyle(onAccent)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            .background(Rectangle().fill(accent))
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                    .fill(accent)
+            )
             .opacity(configuration.isPressed ? 0.85 : 1.0)
     }
 }
@@ -272,7 +401,14 @@ private struct GhostButtonStyle: ButtonStyle {
             .foregroundStyle(ink)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            .overlay(Rectangle().stroke(ink, lineWidth: 1))
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                    .fill(AppColors.surface(for: scheme))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
+                    .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+            )
             .opacity(configuration.isPressed ? 0.85 : 1.0)
     }
 }
@@ -283,7 +419,7 @@ private struct StepsSection: View {
     let brewModel: BrewModel
     let timerModel: BrewTimerModel
     @Binding var manuallyExpanded: Int?
-    @Environment(\.colorScheme) private var scheme
+    var horizontalPadding: CGFloat = 24
 
     var body: some View {
         let steps = BrewStep.steps(for: brewModel)
@@ -292,19 +428,20 @@ private struct StepsSection: View {
             HStack {
                 SectionHeader(number: "01\u{2013}08", kicker: "Tap a step")
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, horizontalPadding)
             .padding(.bottom, 8)
 
-            VStack(spacing: 0) {
+            VStack(spacing: 8) {
                 ForEach(steps) { step in
                     StepRow(
                         step: step,
                         active: isActive(step: step),
                         onTap: { toggle(step: step) }
                     )
+                    .id(step.id)
                 }
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, horizontalPadding)
         }
     }
 
@@ -313,18 +450,7 @@ private struct StepsSection: View {
             return manuallyExpanded == step.id
         }
         guard brewModel.autoAdvanceSteps else { return false }
-        return timerActiveStepId == step.id
-    }
-
-    /// The step id matching the timer's current phase, or nil for `.ready`.
-    private var timerActiveStepId: Int? {
-        switch timerModel.phase {
-        case .ready: nil
-        case .bloom: 4
-        case .pour: 6
-        case .drawdown: 7
-        case .done: 8
-        }
+        return timerModel.phase.guideStepId == step.id
     }
 
     private func toggle(step: BrewStep) {
@@ -344,67 +470,74 @@ private struct StepRow: View {
         let ink = AppColors.ink(for: scheme)
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
+        let surface = AppColors.surface(for: scheme)
 
         Button(action: onTap) {
-            VStack(spacing: 0) {
-                HStack(alignment: .top, spacing: 0) {
-                    Rectangle()
-                        .fill(active ? accent : .clear)
-                        .frame(width: 3)
-
-                    HStack(alignment: .top, spacing: 14) {
-                        Text(step.numberLabel)
-                            .font(AppTypography.serif(36, weight: .regular))
-                            .foregroundStyle(active ? accent : ink)
-                            .kerning(-1.5)
-                            .frame(width: 44, alignment: .leading)
-                            .animation(.snappy, value: active)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 10) {
-                                InkIconView(
-                                    icon: step.icon, size: 18,
-                                    color: active ? accent : ink, strokeWidth: 1.4
-                                )
-                                Text(step.title)
-                                    .font(AppTypography.serif(18, weight: .medium))
-                                    .foregroundStyle(ink)
-                                    .kerning(-0.3)
-                            }
-                            Text(step.meta)
-                                .font(AppTypography.micro)
-                                .tracking(2)
-                                .textCase(.uppercase)
-                                .foregroundStyle(muted)
-                                .padding(.bottom, 2)
-                            Text(step.body)
-                                .font(AppTypography.serif(14))
-                                .foregroundStyle(ink)
-                                .opacity(active ? 1 : 0.85)
-                                .lineLimit(active ? nil : 1)
-                                .multilineTextAlignment(.leading)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .animation(.snappy, value: active)
-                        }
-
-                        InkIconView(
-                            icon: .chevron, size: 14,
-                            color: muted, strokeWidth: 1.6
-                        )
-                        .rotationEffect(.degrees(active ? 90 : 0))
-                        .padding(.top, 10)
-                        .animation(.snappy, value: active)
-                    }
-                    .padding(.leading, 11)
+            HStack(alignment: .top, spacing: 0) {
+                RoundedRectangle(cornerRadius: 2, style: .continuous)
+                    .fill(active ? accent : .clear)
+                    .frame(width: 3)
                     .padding(.vertical, 14)
-                    .padding(.trailing, 0)
+
+                HStack(alignment: .top, spacing: 14) {
+                    Text(step.numberLabel)
+                        .font(AppTypography.serif(36, weight: .regular))
+                        .foregroundStyle(active ? accent : ink)
+                        .kerning(-1.5)
+                        .frame(width: 44, alignment: .leading)
+                        .animation(.snappy, value: active)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 10) {
+                            InkIconView(
+                                icon: step.icon, size: 18,
+                                color: active ? accent : ink, strokeWidth: 1.4
+                            )
+                            Text(step.title)
+                                .font(AppTypography.serif(18, weight: .medium))
+                                .foregroundStyle(ink)
+                                .kerning(-0.3)
+                        }
+                        Text(step.meta)
+                            .font(AppTypography.micro)
+                            .tracking(2)
+                            .textCase(.uppercase)
+                            .foregroundStyle(muted)
+                            .padding(.bottom, 2)
+                        Text(step.body)
+                            .font(AppTypography.serif(14))
+                            .foregroundStyle(ink)
+                            .opacity(active ? 1 : 0.85)
+                            .lineLimit(active ? nil : 1)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .animation(.snappy, value: active)
+                    }
+
+                    InkIconView(
+                        icon: .chevron, size: 14,
+                        color: muted, strokeWidth: 1.6
+                    )
+                    .rotationEffect(.degrees(active ? 90 : 0))
+                    .padding(.top, 10)
+                    .animation(.snappy, value: active)
                 }
-                .background(active ? AppColors.chip(for: scheme) : .clear)
-                Rule(color: AppColors.rule(for: scheme))
+                .padding(.leading, 11)
+                .padding(.vertical, 14)
+                .padding(.trailing, 12)
             }
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.row, style: .continuous)
+                    .fill(active ? AppColors.chip(for: scheme) : surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.row, style: .continuous)
+                    .stroke(active ? accent.opacity(0.42) : AppColors.rule(for: scheme), lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("guide.step.\(step.id)")
     }
 }
 
