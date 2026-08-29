@@ -1,0 +1,29 @@
+# See store-01-brew.yaml for why this flow uses raw tool steps and coordinates.
+executionPrerequisite: >-
+  App on the Brew tab with the light roast selected and the dose nudged up
+  by the previous segment.
+
+steps:
+  - echo: Oversized swipe so the scroll clamps at the bottom, making positions deterministic
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.85, toX: 0.5, toY: 0.15, durationMs: 700 }
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        identifier: brew.begin
+      timeoutMs: 10000
+  - wait: 1000
+  - echo: (0.5, 0.712) is the Begin the brew CTA with the scroll clamped at the bottom
+  - tap: { x: 0.5, y: 0.712 }
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Start brew
+      timeoutMs: 10000
+  - wait: 1200
+  - echo: (0.5, 0.485) is the Start brew primary button in the timer strip
+  - tap: { x: 0.5, y: 0.485 }
+  - echo: Let the live timer tick into the bloom phase
+  - wait: 4000

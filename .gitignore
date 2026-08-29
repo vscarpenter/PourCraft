@@ -19,3 +19,5 @@ xcuserdata/
 
 # Claude Code
 .claude/
+goldie/out/
+.argent/recordings/

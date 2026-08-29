@@ -1,0 +1,32 @@
+# See store-01-brew.yaml for why this flow uses raw tool steps and coordinates.
+steps:
+  - tool: restart-app
+    args:
+      bundleId: com.pourcraft.app
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Choose your roast.
+      timeoutMs: 30000
+  - echo: Bump the dose 20g -> 24g; (0.895, 0.601) is the Increase dose stepper
+  - tap: { x: 0.895, y: 0.601 }
+  - wait: 300
+  - tap: { x: 0.895, y: 0.601 }
+  - wait: 300
+  - tap: { x: 0.895, y: 0.601 }
+  - wait: 300
+  - tap: { x: 0.895, y: 0.601 }
+  - wait: 300
+  - echo: Oversized swipe so the scroll clamps at the bottom, making positions deterministic
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.85, toX: 0.5, toY: 0.15, durationMs: 700 }
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        identifier: brew.begin
+      timeoutMs: 10000
+  - tool: await-screen-idle
+    args:
+      timeoutMs: 10000

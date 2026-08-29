@@ -1,0 +1,30 @@
+# See store-01-brew.yaml for why this flow uses raw tool steps and coordinates.
+steps:
+  - tool: restart-app
+    args:
+      bundleId: com.pourcraft.app
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Choose your roast.
+      timeoutMs: 30000
+  - echo: (0.377, 0.932) is the Guide tab in the custom zine tab bar
+  - tap: { x: 0.377, y: 0.932 }
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Start brew
+      timeoutMs: 10000
+  - wait: 500
+  - echo: (0.5, 0.485) is the Start brew primary button in the timer strip
+  - tap: { x: 0.5, y: 0.485 }
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Pause
+      timeoutMs: 5000
+  - echo: Timer stays live; goldie's own pre-shot idle wait decides the captured moment
+  - wait: 2000

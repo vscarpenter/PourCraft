@@ -1,0 +1,22 @@
+# See store-01-brew.yaml for why this flow uses raw tool steps and coordinates.
+steps:
+  - tool: restart-app
+    args:
+      bundleId: com.pourcraft.app
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Choose your roast.
+      timeoutMs: 30000
+  - echo: (0.622, 0.932) is the Tips tab in the custom zine tab bar
+  - tap: { x: 0.622, y: 0.932 }
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Grind matters more than beans.
+      timeoutMs: 10000
+  - tool: await-screen-idle
+    args:
+      timeoutMs: 10000
