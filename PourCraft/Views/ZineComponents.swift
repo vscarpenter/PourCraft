@@ -380,46 +380,78 @@ struct SectionHeader: View {
 
 // MARK: - ZineSection (header + title + content)
 
-struct ZineSection<Content: View>: View {
+struct ZineSection<Accessory: View, Content: View>: View {
     @Environment(\.colorScheme) private var scheme
     let number: String
     let title: String
     let kicker: String
+    let accessory: Accessory
     let content: Content
 
     init(
         number: String, title: String, kicker: String,
+        @ViewBuilder accessory: () -> Accessory,
         @ViewBuilder content: () -> Content
     ) {
         self.number = number
         self.title = title
         self.kicker = kicker
+        self.accessory = accessory()
         self.content = content()
     }
 
     var body: some View {
-        let ink = AppColors.ink(for: scheme)
-
         VStack(alignment: .leading, spacing: 0) {
             SectionHeader(number: number, kicker: kicker)
 
-            Text(title)
-                .font(AppTypography.sectionTitle)
-                .foregroundStyle(ink)
-                .kerning(-0.5)
-                .padding(.top, 7)
-                .padding(.bottom, 10)
+            // The accessory shares the title line when both fit and drops
+            // below the title on narrow phones or at large type sizes.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    titleText
+                    Spacer(minLength: 0)
+                    accessory
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    titleText
+                    accessory
+                }
+            }
+            .padding(.top, 7)
+            .padding(.bottom, 10)
 
             content
         }
         .padding(.horizontal, 24)
     }
+
+    private var titleText: some View {
+        Text(title)
+            .font(AppTypography.sectionTitle)
+            .foregroundStyle(AppColors.ink(for: scheme))
+            .kerning(-0.5)
+    }
 }
 
-// MARK: - TemperatureUnitPicker
+extension ZineSection where Accessory == EmptyView {
+    init(
+        number: String, title: String, kicker: String,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(number: number, title: title, kicker: kicker, accessory: { EmptyView() }, content: content)
+    }
+}
 
-struct TemperatureUnitPicker: View {
-    @Binding var selection: TemperatureUnit
+// MARK: - ZineSegmentedPicker
+
+/// Pill-style segmented control shared by the °F/°C picker and the
+/// Coffee | Water mode switch.
+struct ZineSegmentedPicker<Option: Hashable>: View {
+    let options: [Option]
+    @Binding var selection: Option
+    let title: (Option) -> String
+    let spokenLabel: (Option) -> String
     var horizontalPadding: CGFloat = 14
 
     @Environment(\.colorScheme) private var scheme
@@ -430,27 +462,27 @@ struct TemperatureUnitPicker: View {
         let onAccent = AppColors.onAccent(for: scheme)
 
         HStack(spacing: 0) {
-            ForEach(TemperatureUnit.allCases, id: \.self) { unit in
-                let selected = selection == unit
+            ForEach(options, id: \.self) { option in
+                let selected = selection == option
                 Button {
                     withAnimation(.snappy) {
-                        selection = unit
+                        selection = option
                     }
                 } label: {
-                Text(unit.label)
-                    .font(AppTypography.sans(.caption, weight: .semibold))
-                    .tracking(1)
-                    .foregroundStyle(selected ? onAccent : ink)
-                    .zineChromeLine(minimumScaleFactor: 0.75)
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, horizontalPadding)
+                    Text(title(option))
+                        .font(AppTypography.sans(.caption, weight: .semibold))
+                        .tracking(1)
+                        .foregroundStyle(selected ? onAccent : ink)
+                        .zineChromeLine(minimumScaleFactor: 0.75)
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, horizontalPadding)
                         .background(
                             RoundedRectangle(cornerRadius: AppCorners.control - 4, style: .continuous)
                                 .fill(selected ? accent : .clear)
                         )
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(unit == .fahrenheit ? "Fahrenheit" : "Celsius")
+                .accessibilityLabel(spokenLabel(option))
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
@@ -462,6 +494,23 @@ struct TemperatureUnitPicker: View {
         .overlay(
             RoundedRectangle(cornerRadius: AppCorners.control, style: .continuous)
                 .stroke(AppColors.rule(for: scheme), lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - TemperatureUnitPicker
+
+struct TemperatureUnitPicker: View {
+    @Binding var selection: TemperatureUnit
+    var horizontalPadding: CGFloat = 14
+
+    var body: some View {
+        ZineSegmentedPicker(
+            options: TemperatureUnit.allCases,
+            selection: $selection,
+            title: { $0.label },
+            spokenLabel: { $0 == .fahrenheit ? "Fahrenheit" : "Celsius" },
+            horizontalPadding: horizontalPadding
         )
     }
 }

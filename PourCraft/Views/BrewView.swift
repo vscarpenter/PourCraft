@@ -93,7 +93,19 @@ struct BrewView: View {
     }
 
     private var doseSection: some View {
-        ZineSection(number: "02", title: "Dial in the dose.", kicker: "Grams") {
+        ZineSection(
+            number: "02",
+            title: brewModel.anchor == .coffee ? "Dial in the dose." : "Dial in the water.",
+            kicker: "Grams"
+        ) {
+            ZineSegmentedPicker(
+                options: BrewAnchor.allCases,
+                selection: $brewModel.anchor,
+                title: { $0.label },
+                spokenLabel: { "Start from \($0.label.lowercased())" },
+                horizontalPadding: 12
+            )
+        } content: {
             DoseInput(brewModel: brewModel)
         }
     }
@@ -228,6 +240,34 @@ private struct RoastRow: View {
 
 // MARK: - Dose input (big numeral + ruler slider)
 
+/// What Section 02's dial edits: the dose in coffee mode, the water in water mode.
+private struct DialSpec {
+    let scale: RulerScale
+    /// Noun for the stepper labels, as in "Increase dose".
+    let noun: String
+    /// VoiceOver name for the numeral and the ruler.
+    let spokenName: String
+
+    init(anchor: BrewAnchor) {
+        switch anchor {
+        case .coffee:
+            scale = RulerScale(range: BrewModel.coffeeWeightRange, step: BrewModel.coffeeWeightStep)
+            noun = "dose"
+            spokenName = "Coffee dose"
+        case .water:
+            scale = RulerScale(range: BrewModel.waterRange, step: BrewModel.waterStep)
+            noun = "water"
+            spokenName = "Water amount"
+        }
+    }
+
+    var rangeLabel: String {
+        let low = BrewModel.formattedGrams(scale.range.lowerBound)
+        let high = BrewModel.formattedGrams(scale.range.upperBound)
+        return "\(low)g \u{2014} \(high)g"
+    }
+}
+
 private struct DoseInput: View {
     @Bindable var brewModel: BrewModel
     @Environment(\.colorScheme) private var scheme
@@ -236,35 +276,49 @@ private struct DoseInput: View {
         let ink = AppColors.ink(for: scheme)
         let muted = AppColors.muted(for: scheme)
         let accent = AppColors.accent(for: scheme)
+        let dial = DialSpec(anchor: brewModel.anchor)
+        let amount = amountBinding
+        let amountText = brewModel.formattedWeight(amount.wrappedValue)
 
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .bottom) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("\(Int(brewModel.coffeeWeight))")
+                    Text(amountText)
                         .font(AppTypography.serif(76, weight: .regular, relativeTo: .title))
                         .foregroundStyle(ink)
                         .kerning(-3)
                         .monospacedDigit()
                         .contentTransition(.numericText())
-                        .animation(.snappy, value: brewModel.coffeeWeight)
+                        .animation(.snappy, value: amount.wrappedValue)
                     Text("g")
                         .font(AppTypography.serifItalic(22))
                         .foregroundStyle(muted)
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(dial.spokenName)
+                .accessibilityValue("\(amountText) grams")
 
                 Spacer()
 
                 VStack(spacing: 8) {
-                    StepperButton(icon: .plus, isDisabled: brewModel.coffeeWeight >= 60) {
-                        brewModel.coffeeWeight += 1
+                    StepperButton(
+                        icon: .plus,
+                        spokenLabel: "Increase \(dial.noun)",
+                        isDisabled: amount.wrappedValue >= dial.scale.range.upperBound
+                    ) {
+                        amount.wrappedValue += dial.scale.step
                     }
-                    StepperButton(icon: .minus, isDisabled: brewModel.coffeeWeight <= 10) {
-                        brewModel.coffeeWeight -= 1
+                    StepperButton(
+                        icon: .minus,
+                        spokenLabel: "Decrease \(dial.noun)",
+                        isDisabled: amount.wrappedValue <= dial.scale.range.lowerBound
+                    ) {
+                        amount.wrappedValue -= dial.scale.step
                     }
                 }
             }
 
-            DoseRuler(value: $brewModel.coffeeWeight)
+            DoseRuler(value: amount, scale: dial.scale, spokenLabel: dial.spokenName)
                 .padding(.top, -2)
 
             HStack {
@@ -275,7 +329,7 @@ private struct DoseInput: View {
                     .font(AppTypography.serif(14, weight: .medium))
                     .foregroundColor(accent))
                 Spacer()
-                Text("10g \u{2014} 60g")
+                Text(dial.rangeLabel)
                     .font(AppTypography.kicker)
                     .tracking(1.5)
                     .textCase(.uppercase)
@@ -283,10 +337,19 @@ private struct DoseInput: View {
             }
         }
     }
+
+    /// The dial edits the dose in coffee mode and the water in water mode.
+    private var amountBinding: Binding<Double> {
+        switch brewModel.anchor {
+        case .coffee: $brewModel.coffeeWeight
+        case .water: $brewModel.waterTarget
+        }
+    }
 }
 
 private struct StepperButton: View {
     let icon: InkIcon
+    let spokenLabel: String
     var isDisabled: Bool = false
     let action: () -> Void
     @Environment(\.colorScheme) private var scheme
@@ -310,38 +373,40 @@ private struct StepperButton: View {
         .buttonStyle(.plain)
         .disabled(isDisabled)
         .opacity(isDisabled ? 0.35 : 1.0)
-        .accessibilityLabel(icon == .plus ? "Increase dose" : "Decrease dose")
+        .accessibilityLabel(spokenLabel)
     }
 }
 
 private struct DoseRuler: View {
     @Binding var value: Double
+    let scale: RulerScale
+    let spokenLabel: String
     @Environment(\.colorScheme) private var scheme
 
-    private let minValue: Double = 10
-    private let maxValue: Double = 60
-    private static let tickMarks = Array(stride(from: 10, through: 60, by: 1))
+    /// Every fifth tick is tall: each 5 g of coffee or 50 g of water.
+    private static let majorTickInterval = 5
 
     var body: some View {
         let ink = AppColors.ink(for: scheme)
         let accent = AppColors.accent(for: scheme)
 
         GeometryReader { geo in
-            let range = maxValue - minValue
-            let pct = (value - minValue) / range
-            let markerX = pct * geo.size.width
+            let width = geo.size.width
 
             ZStack(alignment: .topLeading) {
-                HStack(alignment: .top, spacing: 0) {
-                    ForEach(Self.tickMarks, id: \.self) { tick in
-                        let isMajor = tick % 5 == 0
-                        Rectangle()
-                            .fill(ink.opacity(isMajor ? 0.85 : 0.35))
-                            .frame(width: 1, height: isMajor ? 18 : 9)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                Canvas { context, size in
+                    for index in 0..<scale.tickCount {
+                        let isMajor = index % Self.majorTickInterval == 0
+                        let tick = CGRect(
+                            x: scale.x(forTick: index, width: size.width) - 0.5,
+                            y: 0,
+                            width: 1,
+                            height: isMajor ? 18 : 9
+                        )
+                        context.fill(Path(tick), with: .color(ink.opacity(isMajor ? 0.85 : 0.35)))
                     }
                 }
-                .frame(height: 18, alignment: .top)
+                .frame(height: 18)
 
                 Path { path in
                     path.move(to: CGPoint(x: 0, y: 10))
@@ -351,37 +416,38 @@ private struct DoseRuler: View {
                 }
                 .fill(accent)
                 .frame(width: 14, height: 10)
-                .offset(x: markerX - 7, y: -6)
+                .offset(x: scale.x(for: value, width: width) - 7, y: -6)
                 .animation(.snappy, value: value)
             }
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { drag in
-                        guard geo.size.width > 0 else { return }
-                        let clampedX = max(0, min(geo.size.width, drag.location.x))
-                        let newPct = clampedX / geo.size.width
-                        setValue(minValue + newPct * range)
+                        guard width > 1 else { return }
+                        setValue(scale.value(at: drag.location.x, width: width))
                     }
             )
         }
         .frame(height: 34)
         .accessibilityElement()
-        .accessibilityLabel("Coffee dose")
-        .accessibilityValue("\(Int(value)) grams")
+        .accessibilityLabel(spokenLabel)
+        .accessibilityValue("\(BrewModel.formattedGrams(value)) grams")
         .accessibilityAdjustableAction { direction in
             switch direction {
-            case .increment: setValue(value + 1)
-            case .decrement: setValue(value - 1)
+            case .increment: nudge(by: scale.step)
+            case .decrement: nudge(by: -scale.step)
             @unknown default: break
             }
         }
     }
 
+    private func nudge(by delta: Double) {
+        setValue(BrewModel.snapped(value + delta, step: scale.step, in: scale.range))
+    }
+
     private func setValue(_ newValue: Double) {
-        let clamped = min(max(newValue, minValue), maxValue).rounded()
-        guard clamped != value else { return }
-        value = clamped
+        guard newValue != value else { return }
+        value = newValue
     }
 }
 
@@ -395,13 +461,7 @@ private struct PourBlock: View {
         VStack(alignment: .leading, spacing: 0) {
             CafeCard(padding: 18) {
                 VStack(spacing: 0) {
-                    PourLine(
-                        icon: .v60,
-                        label: "Total water",
-                        value: integer(brewModel.totalWater),
-                        unit: "g",
-                        big: true
-                    )
+                    headline
 
                     Rule(color: AppColors.rule(for: scheme))
                         .padding(.vertical, 14)
@@ -439,6 +499,29 @@ private struct PourBlock: View {
                 TemperatureUnitPicker(selection: $brewModel.temperatureUnit, horizontalPadding: 16)
             }
             .padding(.top, 14)
+        }
+    }
+
+    /// The computed side of the ratio leads: water in coffee mode, the dose in water mode.
+    @ViewBuilder
+    private var headline: some View {
+        switch brewModel.anchor {
+        case .coffee:
+            PourLine(
+                icon: .v60,
+                label: "Total water",
+                value: integer(brewModel.totalWater),
+                unit: "g",
+                big: true
+            )
+        case .water:
+            PourLine(
+                icon: .beans,
+                label: "Coffee dose",
+                value: brewModel.formattedWeight(brewModel.coffeeWeight),
+                unit: "g",
+                big: true
+            )
         }
     }
 
@@ -485,7 +568,9 @@ private struct PourLine: View {
                 }
             }
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(unit == "g" ? "\(value) grams" : value)
     }
 }
 
