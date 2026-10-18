@@ -542,10 +542,7 @@ private struct BeginBrewBlock: View {
     }
 
     private var presetMatchesCurrent: Bool {
-        morningPreset?.matches(
-            roast: brewModel.selectedRoast,
-            coffeeWeight: brewModel.coffeeWeight
-        ) == true
+        morningPreset?.matches(brewModel.currentPreset) == true
     }
 }
 
