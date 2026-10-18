@@ -53,7 +53,7 @@ struct WaterFirstModeTests {
 
     // MARK: - Water range
 
-    @Test("Should clamp water to 200–900 g")
+    @Test("Should keep water between 200 g and 900 g")
     func shouldClampWaterTarget() {
         let model = BrewModel()
         model.waterTarget = 50
@@ -71,7 +71,7 @@ struct WaterFirstModeTests {
         #expect(model.waterTarget == 610)
     }
 
-    @Test("Should keep every derived dose inside the 10–60 g coffee range",
+    @Test("Should keep every derived dose between 10 g and 60 g",
           arguments: Roast.allCases)
     func shouldKeepDerivedDoseInsideCoffeeRange(roast: Roast) {
         for water in [BrewModel.waterRange.lowerBound, BrewModel.waterRange.upperBound] {
