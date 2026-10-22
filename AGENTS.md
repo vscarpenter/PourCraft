@@ -52,7 +52,7 @@ PourCraft/
 │   ├── PourCraftApp.swift           # @main, iPhone tab shell + iPad sidebar, @AppStorage persistence
 │   ├── Info.plist                   # UIAppFonts (Fraunces) + UILaunchScreen (LaunchIcon)
 │   ├── Models/
-│   │   ├── BrewModel.swift          # @Observable: roast, weight, temp unit, computed water
+│   │   ├── BrewModel.swift          # @Observable: roast, coffee/water mode, dose, water, temp unit, computed pours
 │   │   ├── BrewTimerModel.swift     # @Observable: live brew timer (ready/bloom/pour/drawdown/done)
 │   │   ├── BrewStep.swift           # 8 guide steps derived from BrewModel + timer phase
 │   │   ├── BrewTip.swift            # 8 magazine field-notes (title, dek, body[], pull, refs[])
@@ -64,6 +64,7 @@ PourCraft/
 │   │   ├── TipDetailView.swift      # Article: 140pt numeral, drop cap, pull quote, references
 │   │   ├── AboutView.swift          # Colophon: manifesto, by-the-numbers, masthead credits, prefs
 │   │   ├── ZineComponents.swift     # Masthead, SubHeader, ZineSection, SectionHeader, Rule
+│   │   ├── RulerScale.swift         # Tick geometry for the Brew tab's dose and water ruler
 │   │   └── ZineTabBar.swift         # Custom 4-tab bar (Brew / Guide / Tips / About)
 │   ├── Theme/
 │   │   ├── Colors.swift             # AppColors: zine palette + adaptive light/dark helpers
@@ -78,9 +79,11 @@ PourCraft/
 │   └── Assets.xcassets/             # AppIcon (single 1024 universal), LaunchIcon, AccentColor, LaunchBackground
 ├── PourCraftTests/
     ├── RoastTests.swift             # 7 tests: cases, ratios, labels, Codable, flavors, names, short descriptor
-    ├── BrewModelTests.swift         # 24 tests: defaults, reference table, bloom, clamping, formatting, persistence, temp point
+    ├── BrewModelTests.swift         # 39 tests: defaults, reference table, bloom, clamping, formatting, locale, persistence, presets, temp point
+    ├── WaterFirstModeTests.swift    # 24 tests: inverse ratios, water range, mode switching, presets, guide text
+    ├── RulerScaleTests.swift        # 5 tests: tick count, tick-to-value mapping, marker alignment, clamping
     ├── BrewStepTests.swift          # 7 tests: 8-step generation, dynamic weights, phase mapping
-    ├── BrewTimerModelTests.swift    # 27 tests: phase transitions, pause/resume, wall-clock sync
+    ├── BrewTimerModelTests.swift    # 29 tests: phase transitions, pause/resume, wall-clock sync
     ├── BrewTipTests.swift           # 9 tests: count, schema completeness, body length, refs, lookup, wraparound
     ├── ZineEditionTests.swift       # 5 tests: month derivation, randomization formatting, determinism
     ├── ColorHexTests.swift          # 9 tests: valid/invalid hex parsing, whitespace, empty input
@@ -155,8 +158,21 @@ var coffeeWeight: Double {
 | Medium | 1:16  | 240g | 320g | 400g | 480g |
 | Light  | 1:17  | 255g | 340g | 425g | 510g |
 
-Bloom water = 2× coffee weight. Coffee weight range: 10–60g, default 20g.
+Bloom water = 2× the dose, rounded to a whole gram. Coffee weight range: 10-60 g, default 20 g.
 Brew timer target: 3:30 total (30s bloom, 60% of remaining for pour, rest drawdown).
+
+### Water-first mode
+
+The Coffee | Water toggle on the Brew tab lets the user set water instead of
+coffee: 200-900 g in 10 g steps, with the dose derived as water ÷ ratio and
+rounded to 0.1 g. Switching modes carries the numbers across, and "Save as my
+morning" stores the mode with its amount.
+
+| Roast  | Ratio | 300g  | 450g  | 600g  | 900g  |
+|--------|-------|-------|-------|-------|-------|
+| Dark   | 1:15  | 20g   | 30g   | 40g   | 60g   |
+| Medium | 1:16  | 18.8g | 28.1g | 37.5g | 56.3g |
+| Light  | 1:17  | 17.6g | 26.5g | 35.3g | 52.9g |
 
 ## Adding New Files
 

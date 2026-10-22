@@ -14,10 +14,13 @@ final class PourCraftUITests: XCTestCase {
         app.launchArguments = [
             "-selectedRoast", "medium",
             "-temperatureUnit", "fahrenheit",
+            "-brewAnchor", "coffee",
             "-hapticsEnabled", "YES",
             "-autoAdvanceSteps", autoAdvanceSteps ? "YES" : "NO",
             "-savedPresetRoast", "",
-            "-savedPresetWeight", "0"
+            "-savedPresetWeight", "0",
+            "-savedPresetAnchor", "",
+            "-savedPresetWater", "0"
         ]
     }
 

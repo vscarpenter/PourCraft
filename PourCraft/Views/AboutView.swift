@@ -124,7 +124,7 @@ private struct Manifesto: View {
 private struct BodyParagraph: View {
     @Environment(\.colorScheme) private var scheme
     var body: some View {
-        Text("Choose a roast. Set the dose. The numbers fall out. Then we get out of the way and let you brew.")
+        Text("Choose a roast. Set the dose, or start from the water. The numbers fall out. Then we get out of the way and let you brew.")
             .font(AppTypography.serif(15))
             .foregroundStyle(AppColors.ink(for: scheme))
             .lineSpacing(4)

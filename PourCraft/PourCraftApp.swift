@@ -9,10 +9,13 @@ struct PourCraftApp: App {
 
     @AppStorage("selectedRoast") private var savedRoast: String = Roast.medium.rawValue
     @AppStorage("temperatureUnit") private var savedTempUnit: String = TemperatureUnit.fahrenheit.rawValue
+    @AppStorage("brewAnchor") private var savedAnchor: String = BrewAnchor.coffee.rawValue
     @AppStorage("hapticsEnabled") private var savedHapticsEnabled: Bool = true
     @AppStorage("autoAdvanceSteps") private var savedAutoAdvanceSteps: Bool = true
     @AppStorage("savedPresetRoast") private var savedPresetRoast: String = ""
     @AppStorage("savedPresetWeight") private var savedPresetWeight: Double = 0
+    @AppStorage("savedPresetAnchor") private var savedPresetAnchor: String = ""
+    @AppStorage("savedPresetWater") private var savedPresetWater: Double = 0
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -36,12 +39,18 @@ struct PourCraftApp: App {
                     savedTempUnit: savedTempUnit,
                     savedHapticsEnabled: savedHapticsEnabled,
                     savedAutoAdvanceSteps: savedAutoAdvanceSteps,
+                    savedAnchor: savedAnchor,
                     savedPresetRoast: savedPresetRoast,
-                    savedPresetWeight: savedPresetWeight
+                    savedPresetWeight: savedPresetWeight,
+                    savedPresetAnchor: savedPresetAnchor,
+                    savedPresetWater: savedPresetWater
                 )
             }
             .onChange(of: brewModel.selectedRoast) { _, newValue in
                 savedRoast = newValue.rawValue
+            }
+            .onChange(of: brewModel.anchor) { _, newValue in
+                savedAnchor = newValue.rawValue
             }
             .onChange(of: brewModel.temperatureUnit) { _, newValue in
                 savedTempUnit = newValue.rawValue
@@ -116,14 +125,21 @@ struct PourCraftApp: App {
     }
 
     private var morningPreset: BrewPreset? {
-        guard savedPresetWeight > 0, let roast = Roast(rawValue: savedPresetRoast) else {
-            return nil
-        }
-        return BrewPreset(roast: roast, coffeeWeight: savedPresetWeight)
+        BrewPreset(
+            storedRoast: savedPresetRoast,
+            storedAnchor: savedPresetAnchor,
+            coffeeGrams: savedPresetWeight,
+            waterGrams: savedPresetWater
+        )
     }
 
+    /// Stores only the amount for the preset's mode, so the saved state is
+    /// never ambiguous about which side of the ratio the user pinned.
     private func saveMorningPreset() {
-        savedPresetRoast = brewModel.selectedRoast.rawValue
-        savedPresetWeight = brewModel.coffeeWeight
+        let preset = brewModel.currentPreset
+        savedPresetRoast = preset.roast.rawValue
+        savedPresetAnchor = preset.anchor.rawValue
+        savedPresetWeight = preset.anchor == .coffee ? preset.amount : 0
+        savedPresetWater = preset.anchor == .water ? preset.amount : 0
     }
 }

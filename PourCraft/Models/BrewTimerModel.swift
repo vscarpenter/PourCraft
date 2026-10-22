@@ -103,9 +103,9 @@ final class BrewTimerModel {
         case .ready:
             "Tap Start when ready to brew"
         case .bloom:
-            "Pour \(formattedWeight(bloomWaterAmount))g over grounds, then wait"
+            "Pour \(BrewModel.formattedGrams(bloomWaterAmount))g over grounds, then wait"
         case .pour:
-            "Slowly pour \(formattedWeight(remainingWaterAmount))g in a spiral"
+            "Slowly pour \(BrewModel.formattedGrams(remainingWaterAmount))g in a spiral"
         case .drawdown:
             "Wait for water to drain through"
         case .done:
@@ -223,11 +223,5 @@ final class BrewTimerModel {
         let minutes = totalSeconds / 60
         let seconds = totalSeconds % 60
         return String(format: "%d:%02d", minutes, seconds)
-    }
-
-    private func formattedWeight(_ value: Double) -> String {
-        value.truncatingRemainder(dividingBy: 1) == 0
-            ? String(format: "%.0f", value)
-            : String(format: "%.1f", value)
     }
 }

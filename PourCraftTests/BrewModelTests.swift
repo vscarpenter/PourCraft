@@ -1,8 +1,11 @@
+import Foundation
 import Testing
 @testable import PourCraft
 
 @Suite("BrewModel")
 struct BrewModelTests {
+    /// Pins number formatting so results don't depend on the simulator's region.
+    private static let usEnglish = Locale(identifier: "en_US")
 
     // MARK: - Default State
 
@@ -169,40 +172,46 @@ struct BrewModelTests {
     @Test("Should format whole numbers without decimals")
     func shouldFormatWholeNumbers() {
         let model = BrewModel()
-        #expect(model.formattedWeight(320) == "320")
-        #expect(model.formattedWeight(20) == "20")
+        #expect(model.formattedWeight(320, locale: Self.usEnglish) == "320")
+        #expect(model.formattedWeight(20, locale: Self.usEnglish) == "20")
     }
 
     @Test("Should format fractional numbers with one decimal")
     func shouldFormatFractionalNumbers() {
         let model = BrewModel()
-        #expect(model.formattedWeight(320.5) == "320.5")
+        #expect(model.formattedWeight(320.5, locale: Self.usEnglish) == "320.5")
     }
 
     @Test("Should format zero as whole number")
     func shouldFormatZero() {
         let model = BrewModel()
-        #expect(model.formattedWeight(0) == "0")
+        #expect(model.formattedWeight(0, locale: Self.usEnglish) == "0")
     }
 
     @Test("Should format negative values without crashing")
     func shouldFormatNegativeValues() {
         let model = BrewModel()
-        let result = model.formattedWeight(-5)
+        let result = model.formattedWeight(-5, locale: Self.usEnglish)
         #expect(result == "-5")
     }
 
     @Test("Should format small fractional value with one decimal")
     func shouldFormatSmallFraction() {
         let model = BrewModel()
-        #expect(model.formattedWeight(0.5) == "0.5")
+        #expect(model.formattedWeight(0.5, locale: Self.usEnglish) == "0.5")
     }
 
     @Test("Should format large values correctly")
     func shouldFormatLargeValues() {
         let model = BrewModel()
-        #expect(model.formattedWeight(1000) == "1000")
-        #expect(model.formattedWeight(999.9) == "999.9")
+        #expect(model.formattedWeight(1000, locale: Self.usEnglish) == "1000")
+        #expect(model.formattedWeight(999.9, locale: Self.usEnglish) == "999.9")
+    }
+
+    @Test("Should use the locale's decimal separator")
+    func shouldFormatWithLocaleDecimalSeparator() {
+        let model = BrewModel()
+        #expect(model.formattedWeight(37.5, locale: Locale(identifier: "de_DE")) == "37,5")
     }
 
     // MARK: - Preference Restoration
@@ -342,12 +351,12 @@ struct BrewModelTests {
         #expect(model.coffeeWeight == 28)
     }
 
-    @Test("Should match a morning preset by roast and whole-gram weight")
-    func shouldMatchMorningPresetByRoastAndWholeGramWeight() {
-        let preset = BrewPreset(roast: .medium, coffeeWeight: 20.4)
+    @Test("Should match a coffee-first morning preset by roast and dose")
+    func shouldMatchCoffeeFirstPresetByRoastAndDose() {
+        let preset = BrewPreset(roast: .medium, anchor: .coffee, amount: 20)
 
-        #expect(preset.matches(roast: .medium, coffeeWeight: 20.9))
-        #expect(!preset.matches(roast: .light, coffeeWeight: 20.9))
-        #expect(!preset.matches(roast: .medium, coffeeWeight: 21))
+        #expect(preset.matches(BrewPreset(roast: .medium, anchor: .coffee, amount: 20)))
+        #expect(!preset.matches(BrewPreset(roast: .light, anchor: .coffee, amount: 20)))
+        #expect(!preset.matches(BrewPreset(roast: .medium, anchor: .coffee, amount: 21)))
     }
 }
