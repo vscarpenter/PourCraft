@@ -11,6 +11,13 @@ Privacy URL: <https://www.pourcraftcoffee.com/privacy.html>
 - `iPhone-Timer-Running.png` - `1320x2868`
 - `iPhone-Tip-Article.png` - `1320x2868`
 
+## iPhone 6.3-inch
+
+- `iPhone-Brew-Compact.png` - `1206x2622`
+- `iPhone-Guide-Compact.png` - `1206x2622`
+- `iPhone-Timer-Running.png` - `1206x2622`
+- `iPhone-Tip-Article.png` - `1206x2622`
+
 ## iPad 13-inch
 
 - `iPad-Brew-Portrait.png` - `2064x2752`

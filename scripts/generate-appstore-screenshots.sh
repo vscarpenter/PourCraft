@@ -7,15 +7,19 @@ cd "$ROOT_DIR"
 PROJECT="${PROJECT:-PourCraft.xcodeproj}"
 SCHEME="${SCHEME:-PourCraft}"
 IPHONE_DEVICE_NAME="${IPHONE_DEVICE_NAME:-iPhone 17 Pro Max}"
+# App Store Connect requires at least one 6.3-inch (Dynamic Island, medium) iPhone screenshot.
+IPHONE_MEDIUM_DEVICE_NAME="${IPHONE_MEDIUM_DEVICE_NAME:-iPhone 17 Pro}"
 IPAD_DEVICE_NAME="${IPAD_DEVICE_NAME:-iPad Pro 13-inch (M5)}"
 SCREENSHOT_ROOT="${SCREENSHOT_ROOT:-$ROOT_DIR/screenshots/appstore}"
 RESULT_ROOT="${RESULT_ROOT:-$ROOT_DIR/build/appstore-screenshot-results}"
 PRIVACY_URL="${PRIVACY_URL:-https://www.pourcraftcoffee.com/privacy.html}"
 
 IPHONE_DIR="$SCREENSHOT_ROOT/iphone-6.9"
+IPHONE_MEDIUM_DIR="$SCREENSHOT_ROOT/iphone-6.3"
 IPAD_DIR="$SCREENSHOT_ROOT/ipad-13"
 MANIFEST="$SCREENSHOT_ROOT/README.md"
 IPHONE_RESULT="$RESULT_ROOT/iphone-6.9.xcresult"
+IPHONE_MEDIUM_RESULT="$RESULT_ROOT/iphone-6.3.xcresult"
 IPAD_RESULT="$RESULT_ROOT/ipad-13.xcresult"
 
 log() {
@@ -47,6 +51,7 @@ validate_size() {
 
   case "$kind:$size" in
     iphone:1260x2736|iphone:2736x1260|iphone:1290x2796|iphone:2796x1290|iphone:1320x2868|iphone:2868x1320) ;;
+    iphone-medium:1179x2556|iphone-medium:2556x1179|iphone-medium:1206x2622|iphone-medium:2622x1206) ;;
     ipad:2064x2752|ipad:2752x2064|ipad:2048x2732|ipad:2732x2048) ;;
     *) fail "$kind screenshot has unsupported App Store size: $size" ;;
   esac
@@ -181,6 +186,10 @@ write_manifest() {
     for file in "$IPHONE_DIR"/*.png; do
       printf -- '- `%s` - `%s`\n' "$(basename "$file")" "$(image_size "$file")"
     done
+    printf '\n## iPhone 6.3-inch\n\n'
+    for file in "$IPHONE_MEDIUM_DIR"/*.png; do
+      printf -- '- `%s` - `%s`\n' "$(basename "$file")" "$(image_size "$file")"
+    done
     printf '\n## iPad 13-inch\n\n'
     for file in "$IPAD_DIR"/*.png; do
       printf -- '- `%s` - `%s`\n' "$(basename "$file")" "$(image_size "$file")"
@@ -189,10 +198,15 @@ write_manifest() {
 }
 
 IPHONE_DEVICE_ID="$(find_device_id "$IPHONE_DEVICE_NAME")"
+IPHONE_MEDIUM_DEVICE_ID="$(find_device_id "$IPHONE_MEDIUM_DEVICE_NAME")"
 IPAD_DEVICE_ID="$(find_device_id "$IPAD_DEVICE_NAME")"
 
 if [[ -z "$IPHONE_DEVICE_ID" ]]; then
   fail "Could not find simulator named $IPHONE_DEVICE_NAME"
+fi
+
+if [[ -z "$IPHONE_MEDIUM_DEVICE_ID" ]]; then
+  fail "Could not find simulator named $IPHONE_MEDIUM_DEVICE_NAME"
 fi
 
 if [[ -z "$IPAD_DEVICE_ID" ]]; then
@@ -200,6 +214,7 @@ if [[ -z "$IPAD_DEVICE_ID" ]]; then
 fi
 
 log "Using iPhone simulator: $IPHONE_DEVICE_NAME ($IPHONE_DEVICE_ID)"
+log "Using iPhone 6.3-inch simulator: $IPHONE_MEDIUM_DEVICE_NAME ($IPHONE_MEDIUM_DEVICE_ID)"
 log "Using iPad simulator: $IPAD_DEVICE_NAME ($IPAD_DEVICE_ID)"
 
 log "Checking privacy URL"
@@ -209,7 +224,7 @@ log "Regenerating Xcode project"
 xcodegen generate
 
 rm -rf "$SCREENSHOT_ROOT" "$RESULT_ROOT"
-mkdir -p "$IPHONE_DIR" "$IPAD_DIR" "$RESULT_ROOT"
+mkdir -p "$IPHONE_DIR" "$IPHONE_MEDIUM_DIR" "$IPAD_DIR" "$RESULT_ROOT"
 
 run_ui_test \
   "$IPHONE_DEVICE_ID" \
@@ -218,6 +233,14 @@ run_ui_test \
   -only-testing:PourCraftUITests/PourCraftUITests/testCompactPhoneScreenshots
 
 export_result_screenshots "$IPHONE_RESULT" "$IPHONE_DIR" "$RESULT_ROOT/iphone-attachments"
+
+run_ui_test \
+  "$IPHONE_MEDIUM_DEVICE_ID" \
+  "$IPHONE_MEDIUM_DIR" \
+  "$IPHONE_MEDIUM_RESULT" \
+  -only-testing:PourCraftUITests/PourCraftUITests/testCompactPhoneScreenshots
+
+export_result_screenshots "$IPHONE_MEDIUM_RESULT" "$IPHONE_MEDIUM_DIR" "$RESULT_ROOT/iphone-medium-attachments"
 
 run_ui_test \
   "$IPAD_DEVICE_ID" \
@@ -230,6 +253,7 @@ export_result_screenshots "$IPAD_RESULT" "$IPAD_DIR" "$RESULT_ROOT/ipad-attachme
 repair_ipad_landscape_screenshots
 
 validate_dir iphone "$IPHONE_DIR"
+validate_dir iphone-medium "$IPHONE_MEDIUM_DIR"
 validate_dir ipad "$IPAD_DIR"
 write_manifest
 
