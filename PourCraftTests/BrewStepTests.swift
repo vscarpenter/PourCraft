@@ -17,6 +17,15 @@ struct BrewStepTests {
         #expect(ids == Array(1...8))
     }
 
+    @Test("Should heat the water to the roast's target in step 1")
+    func shouldUseRoastTemperatureInStepOne() {
+        let model = BrewModel()
+        model.selectedRoast = .light
+        model.temperatureUnit = .fahrenheit
+        let step = BrewStep.steps(for: model)[0]
+        #expect(step.meta == "205\u{00B0} F")
+    }
+
     @Test("Should embed coffee weight in step 3 meta and body")
     func shouldEmbedCoffeeWeight() {
         let model = BrewModel()

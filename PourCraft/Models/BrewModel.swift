@@ -94,20 +94,27 @@ final class BrewModel {
     }
 
     var temperatureRange: String {
+        let range = selectedRoast.waterTemperatureF
         switch temperatureUnit {
         case .fahrenheit:
-            "194\u{00B0} \u{2013} 204\u{00B0} F"
+            return "\(range.lowerBound)\u{00B0} \u{2013} \(range.upperBound)\u{00B0} F"
         case .celsius:
-            "90\u{00B0} \u{2013} 96\u{00B0} C"
+            return "\(Self.celsius(range.lowerBound))\u{00B0} \u{2013} \(Self.celsius(range.upperBound))\u{00B0} C"
         }
     }
 
-    /// Single-point temperature target shown in the Guide summary strip.
+    /// Single-point temperature target shown in the Guide summary strip:
+    /// the low end of the roast's range.
     var temperaturePoint: String {
+        let point = selectedRoast.waterTemperatureF.lowerBound
         switch temperatureUnit {
-        case .fahrenheit: "200\u{00B0} F"
-        case .celsius: "93\u{00B0} C"
+        case .fahrenheit: return "\(point)\u{00B0} F"
+        case .celsius: return "\(Self.celsius(point))\u{00B0} C"
         }
+    }
+
+    private static func celsius(_ fahrenheit: Int) -> Int {
+        Int((Double(fahrenheit - 32) * 5 / 9).rounded())
     }
 
     // MARK: - Persistence

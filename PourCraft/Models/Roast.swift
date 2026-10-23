@@ -28,6 +28,16 @@ enum Roast: String, CaseIterable, Codable, Identifiable {
         "1:\(ratio)"
     }
 
+    /// Brew water range in °F, matching field note 04: light roasts are dense
+    /// and need hotter water, dark roasts turn bitter if it's too hot.
+    var waterTemperatureF: ClosedRange<Int> {
+        switch self {
+        case .light: 205...210
+        case .medium: 200...205
+        case .dark: 195...200
+        }
+    }
+
     /// Long-form descriptor used in cards and bodies.
     var flavorProfile: String {
         switch self {
