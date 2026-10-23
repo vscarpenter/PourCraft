@@ -1,0 +1,548 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T23:21:29Z",
+  "title": "Design System: PourCraft",
+  "extensions": {
+    "colorMeta": {
+      "copper-kettle": {
+        "role": "primary",
+        "displayName": "Copper Kettle",
+        "canonical": "oklch(61.8% 0.117 60.4)",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 60.4)",
+          "oklch(26.4% 0.062 60.4)",
+          "oklch(37.9% 0.088 60.4)",
+          "oklch(49.3% 0.115 60.4)",
+          "oklch(60.7% 0.117 60.4)",
+          "oklch(72.1% 0.117 60.4)",
+          "oklch(83.6% 0.113 60.4)",
+          "oklch(95.0% 0.031 60.4)"
+        ]
+      },
+      "cafe-paper": {
+        "role": "neutral",
+        "displayName": "Cafe Paper",
+        "canonical": "oklch(96.7% 0.020 81.8)",
+        "tonalRamp": [
+          "oklch(15.0% 0.020 81.8)",
+          "oklch(26.4% 0.020 81.8)",
+          "oklch(37.9% 0.020 81.8)",
+          "oklch(49.3% 0.020 81.8)",
+          "oklch(60.7% 0.020 81.8)",
+          "oklch(72.1% 0.020 81.8)",
+          "oklch(83.6% 0.020 81.8)",
+          "oklch(95.0% 0.020 81.8)"
+        ]
+      },
+      "steamed-milk": {
+        "role": "neutral",
+        "displayName": "Steamed Milk",
+        "canonical": "oklch(98.1% 0.018 81.3)",
+        "tonalRamp": [
+          "oklch(15.0% 0.018 81.3)",
+          "oklch(26.4% 0.018 81.3)",
+          "oklch(37.9% 0.018 81.3)",
+          "oklch(49.3% 0.018 81.3)",
+          "oklch(60.7% 0.018 81.3)",
+          "oklch(72.1% 0.018 81.3)",
+          "oklch(83.6% 0.018 81.3)",
+          "oklch(95.0% 0.018 81.3)"
+        ]
+      },
+      "espresso-ink": {
+        "role": "neutral",
+        "displayName": "Espresso Ink",
+        "canonical": "oklch(25.1% 0.019 40.9)",
+        "tonalRamp": [
+          "oklch(15.0% 0.019 40.9)",
+          "oklch(26.4% 0.019 40.9)",
+          "oklch(37.9% 0.019 40.9)",
+          "oklch(49.3% 0.019 40.9)",
+          "oklch(60.7% 0.019 40.9)",
+          "oklch(72.1% 0.019 40.9)",
+          "oklch(83.6% 0.019 40.9)",
+          "oklch(95.0% 0.019 40.9)"
+        ]
+      },
+      "roasted-bean": {
+        "role": "neutral",
+        "displayName": "Roasted Bean",
+        "canonical": "oklch(45.8% 0.050 66.0)",
+        "tonalRamp": [
+          "oklch(15.0% 0.034 66.0)",
+          "oklch(26.4% 0.050 66.0)",
+          "oklch(37.9% 0.050 66.0)",
+          "oklch(49.3% 0.050 66.0)",
+          "oklch(60.7% 0.050 66.0)",
+          "oklch(72.1% 0.050 66.0)",
+          "oklch(83.6% 0.050 66.0)",
+          "oklch(95.0% 0.034 66.0)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(25.1% 0.019 40.9 / 0.18)",
+        "tonalRamp": [
+          "oklch(15.0% 0.019 40.9 / 0.18)",
+          "oklch(26.4% 0.019 40.9 / 0.18)",
+          "oklch(37.9% 0.019 40.9 / 0.18)",
+          "oklch(49.3% 0.019 40.9 / 0.18)",
+          "oklch(60.7% 0.019 40.9 / 0.18)",
+          "oklch(72.1% 0.019 40.9 / 0.18)",
+          "oklch(83.6% 0.019 40.9 / 0.18)",
+          "oklch(95.0% 0.019 40.9 / 0.18)"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Hairline Strong",
+        "canonical": "oklch(25.1% 0.019 40.9 / 0.85)",
+        "tonalRamp": [
+          "oklch(15.0% 0.019 40.9 / 0.85)",
+          "oklch(26.4% 0.019 40.9 / 0.85)",
+          "oklch(37.9% 0.019 40.9 / 0.85)",
+          "oklch(49.3% 0.019 40.9 / 0.85)",
+          "oklch(60.7% 0.019 40.9 / 0.85)",
+          "oklch(72.1% 0.019 40.9 / 0.85)",
+          "oklch(83.6% 0.019 40.9 / 0.85)",
+          "oklch(95.0% 0.019 40.9 / 0.85)"
+        ]
+      },
+      "copper-rule": {
+        "role": "primary",
+        "displayName": "Copper Rule",
+        "canonical": "oklch(61.8% 0.117 60.4 / 0.42)",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 60.4 / 0.42)",
+          "oklch(26.4% 0.062 60.4 / 0.42)",
+          "oklch(37.9% 0.088 60.4 / 0.42)",
+          "oklch(49.3% 0.115 60.4 / 0.42)",
+          "oklch(60.7% 0.117 60.4 / 0.42)",
+          "oklch(72.1% 0.117 60.4 / 0.42)",
+          "oklch(83.6% 0.113 60.4 / 0.42)",
+          "oklch(95.0% 0.031 60.4 / 0.42)"
+        ]
+      },
+      "copper-tint": {
+        "role": "primary",
+        "displayName": "Copper Tint",
+        "canonical": "oklch(61.8% 0.117 60.4 / 0.12)",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 60.4 / 0.12)",
+          "oklch(26.4% 0.062 60.4 / 0.12)",
+          "oklch(37.9% 0.088 60.4 / 0.12)",
+          "oklch(49.3% 0.115 60.4 / 0.12)",
+          "oklch(60.7% 0.117 60.4 / 0.12)",
+          "oklch(72.1% 0.117 60.4 / 0.12)",
+          "oklch(83.6% 0.113 60.4 / 0.12)",
+          "oklch(95.0% 0.031 60.4 / 0.12)"
+        ]
+      },
+      "copper-tint-strong": {
+        "role": "primary",
+        "displayName": "Copper Tint Strong",
+        "canonical": "oklch(61.8% 0.117 60.4 / 0.18)",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 60.4 / 0.18)",
+          "oklch(26.4% 0.062 60.4 / 0.18)",
+          "oklch(37.9% 0.088 60.4 / 0.18)",
+          "oklch(49.3% 0.115 60.4 / 0.18)",
+          "oklch(60.7% 0.117 60.4 / 0.18)",
+          "oklch(72.1% 0.117 60.4 / 0.18)",
+          "oklch(83.6% 0.113 60.4 / 0.18)",
+          "oklch(95.0% 0.031 60.4 / 0.18)"
+        ]
+      },
+      "burnished-copper": {
+        "role": "primary",
+        "displayName": "Burnished Copper (dark)",
+        "canonical": "oklch(71.6% 0.108 61.0)",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 61.0)",
+          "oklch(26.4% 0.061 61.0)",
+          "oklch(37.9% 0.088 61.0)",
+          "oklch(49.3% 0.108 61.0)",
+          "oklch(60.7% 0.108 61.0)",
+          "oklch(72.1% 0.108 61.0)",
+          "oklch(83.6% 0.108 61.0)",
+          "oklch(95.0% 0.032 61.0)"
+        ]
+      },
+      "night-brew": {
+        "role": "neutral",
+        "displayName": "Night Brew (dark)",
+        "canonical": "oklch(22.3% 0.016 45.2)",
+        "tonalRamp": [
+          "oklch(15.0% 0.016 45.2)",
+          "oklch(26.4% 0.016 45.2)",
+          "oklch(37.9% 0.016 45.2)",
+          "oklch(49.3% 0.016 45.2)",
+          "oklch(60.7% 0.016 45.2)",
+          "oklch(72.1% 0.016 45.2)",
+          "oklch(83.6% 0.016 45.2)",
+          "oklch(95.0% 0.016 45.2)"
+        ]
+      },
+      "dark-roast": {
+        "role": "neutral",
+        "displayName": "Dark Roast (dark)",
+        "canonical": "oklch(25.9% 0.019 45.7)",
+        "tonalRamp": [
+          "oklch(15.0% 0.019 45.7)",
+          "oklch(26.4% 0.019 45.7)",
+          "oklch(37.9% 0.019 45.7)",
+          "oklch(49.3% 0.019 45.7)",
+          "oklch(60.7% 0.019 45.7)",
+          "oklch(72.1% 0.019 45.7)",
+          "oklch(83.6% 0.019 45.7)",
+          "oklch(95.0% 0.019 45.7)"
+        ]
+      },
+      "crema": {
+        "role": "neutral",
+        "displayName": "Crema (dark)",
+        "canonical": "oklch(92.9% 0.024 79.7)",
+        "tonalRamp": [
+          "oklch(15.0% 0.024 79.7)",
+          "oklch(26.4% 0.024 79.7)",
+          "oklch(37.9% 0.024 79.7)",
+          "oklch(49.3% 0.024 79.7)",
+          "oklch(60.7% 0.024 79.7)",
+          "oklch(72.1% 0.024 79.7)",
+          "oklch(83.6% 0.024 79.7)",
+          "oklch(95.0% 0.024 79.7)"
+        ]
+      },
+      "cappuccino": {
+        "role": "neutral",
+        "displayName": "Cappuccino (dark)",
+        "canonical": "oklch(74.9% 0.053 68.8)",
+        "tonalRamp": [
+          "oklch(15.0% 0.033 68.8)",
+          "oklch(26.4% 0.053 68.8)",
+          "oklch(37.9% 0.053 68.8)",
+          "oklch(49.3% 0.053 68.8)",
+          "oklch(60.7% 0.053 68.8)",
+          "oklch(72.1% 0.053 68.8)",
+          "oklch(83.6% 0.053 68.8)",
+          "oklch(95.0% 0.036 68.8)"
+        ]
+      },
+      "hairline-dark": {
+        "role": "neutral",
+        "displayName": "Hairline (dark)",
+        "canonical": "oklch(92.9% 0.024 79.7 / 0.2)",
+        "tonalRamp": [
+          "oklch(15.0% 0.024 79.7 / 0.2)",
+          "oklch(26.4% 0.024 79.7 / 0.2)",
+          "oklch(37.9% 0.024 79.7 / 0.2)",
+          "oklch(49.3% 0.024 79.7 / 0.2)",
+          "oklch(60.7% 0.024 79.7 / 0.2)",
+          "oklch(72.1% 0.024 79.7 / 0.2)",
+          "oklch(83.6% 0.024 79.7 / 0.2)",
+          "oklch(95.0% 0.024 79.7 / 0.2)"
+        ]
+      },
+      "hairline-strong-dark": {
+        "role": "neutral",
+        "displayName": "Hairline Strong (dark)",
+        "canonical": "oklch(92.9% 0.024 79.7 / 0.65)",
+        "tonalRamp": [
+          "oklch(15.0% 0.024 79.7 / 0.65)",
+          "oklch(26.4% 0.024 79.7 / 0.65)",
+          "oklch(37.9% 0.024 79.7 / 0.65)",
+          "oklch(49.3% 0.024 79.7 / 0.65)",
+          "oklch(60.7% 0.024 79.7 / 0.65)",
+          "oklch(72.1% 0.024 79.7 / 0.65)",
+          "oklch(83.6% 0.024 79.7 / 0.65)",
+          "oklch(95.0% 0.024 79.7 / 0.65)"
+        ]
+      },
+      "copper-rule-dark": {
+        "role": "primary",
+        "displayName": "Copper Rule (dark)",
+        "canonical": "oklch(71.6% 0.108 61.0 / 0.42)",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 61.0 / 0.42)",
+          "oklch(26.4% 0.061 61.0 / 0.42)",
+          "oklch(37.9% 0.088 61.0 / 0.42)",
+          "oklch(49.3% 0.108 61.0 / 0.42)",
+          "oklch(60.7% 0.108 61.0 / 0.42)",
+          "oklch(72.1% 0.108 61.0 / 0.42)",
+          "oklch(83.6% 0.108 61.0 / 0.42)",
+          "oklch(95.0% 0.032 61.0 / 0.42)"
+        ]
+      },
+      "copper-tint-dark": {
+        "role": "primary",
+        "displayName": "Copper Tint (dark)",
+        "canonical": "oklch(71.6% 0.108 61.0 / 0.16)",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 61.0 / 0.16)",
+          "oklch(26.4% 0.061 61.0 / 0.16)",
+          "oklch(37.9% 0.088 61.0 / 0.16)",
+          "oklch(49.3% 0.108 61.0 / 0.16)",
+          "oklch(60.7% 0.108 61.0 / 0.16)",
+          "oklch(72.1% 0.108 61.0 / 0.16)",
+          "oklch(83.6% 0.108 61.0 / 0.16)",
+          "oklch(95.0% 0.032 61.0 / 0.16)"
+        ]
+      },
+      "copper-tint-strong-dark": {
+        "role": "primary",
+        "displayName": "Copper Tint Strong (dark)",
+        "canonical": "oklch(71.6% 0.108 61.0 / 0.24)",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 61.0 / 0.24)",
+          "oklch(26.4% 0.061 61.0 / 0.24)",
+          "oklch(37.9% 0.088 61.0 / 0.24)",
+          "oklch(49.3% 0.108 61.0 / 0.24)",
+          "oklch(60.7% 0.108 61.0 / 0.24)",
+          "oklch(72.1% 0.108 61.0 / 0.24)",
+          "oklch(83.6% 0.108 61.0 / 0.24)",
+          "oklch(95.0% 0.032 61.0 / 0.24)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page mastheads, with one copper italic word."
+      },
+      "folio": {
+        "displayName": "Folio",
+        "purpose": "The copper number that opens each field note article."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "The dose or water amount on the Brew dial. Tabular figures."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Sub-page titles on Guide, Tips, and About."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "The computed total in the pour card. Tabular figures."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Numbered section titles, which end in a period."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Article paragraphs, with 4pt added line spacing."
+      },
+      "dek": {
+        "displayName": "Dek",
+        "purpose": "Italic subtitles and supporting lines, in muted ink."
+      },
+      "pull-quote": {
+        "displayName": "Pull Quote",
+        "purpose": "Italic, copper, centered between two hairlines."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "The full-width primary action."
+      },
+      "button-small": {
+        "displayName": "Button Small",
+        "purpose": "Paired timer controls."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Tracked uppercase chrome: kickers, tabs, metadata."
+      },
+      "label-strong": {
+        "displayName": "Label Strong",
+        "purpose": "Bold tracked caps: section numbers and chrome rows."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "snappy",
+        "value": "SwiftUI .snappy spring (0.5s, small bounce)",
+        "purpose": "Every state change: selection, segment switches, tab changes, the ruler marker, the save pill."
+      },
+      {
+        "name": "numeric-text",
+        "value": "contentTransition(.numericText())",
+        "purpose": "Numbers roll digit by digit when the dose, water, or timer changes."
+      },
+      {
+        "name": "timer-progress",
+        "value": "linear, 1s per tick",
+        "purpose": "The live timer's progress bar advances once per second."
+      },
+      {
+        "name": "phase-haptic",
+        "value": "impact medium on bloom, pour, drawdown; success on done",
+        "purpose": "Brew-phase changes, only when the Haptic feedback setting is on."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "760px",
+        "purpose": "Sidebar replaces the tab bar; Brew splits into two columns."
+      },
+      {
+        "name": "wide-roomy",
+        "value": "900px",
+        "purpose": "Sidebar grows from 196pt to 220pt; outer padding from 24pt to 32pt."
+      },
+      {
+        "name": "wide-columns",
+        "value": "940px",
+        "purpose": "Brew's result column grows from 360pt to 420pt."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Begin the Brew",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one full-width copper action on Brew. Kettle leads, chevron trails.",
+      "html": "<button class=\"ds-btn-primary\"><span class=\"ds-btn-primary-lead\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 11V17Q5 19 7 19H15Q17 19 17 17V11M5 11H17M17 12.5Q21 11 21 8Q21 6.5 19.5 6.5M9 11V8Q9 6 11 6H13Q15 6 15 8V11\"/><path d=\"M10 8H14\" opacity=\".5\"/></svg><span>Begin the brew</span></span><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 5L16 12L9 19\"/></svg></button>",
+      "css": ".ds-icon { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; } .ds-btn-primary { display: flex; align-items: center; justify-content: space-between; width: 340px; padding: 18px 22px; background: #B87333; color: #FFF8EC; border: none; border-radius: 18px; font-family: Fraunces, Georgia, serif; font-size: 18px; font-weight: 500; letter-spacing: -0.2px; cursor: pointer; transition: opacity .15s; } .ds-btn-primary-lead { display: flex; align-items: center; gap: 12px; } .ds-btn-primary .ds-icon { width: 22px; height: 22px; stroke-width: 1.6; } .ds-btn-primary > .ds-icon { width: 18px; height: 18px; stroke-width: 1.8; } .ds-btn-primary:active { opacity: .85; } .ds-btn-primary:focus-visible { outline: 2px solid #B87333; outline-offset: 2px; }"
+    },
+    {
+      "name": "Timer Controls",
+      "kind": "button",
+      "refersTo": "button-solid",
+      "description": "Equal-width Ghost and Solid pair under the live timer.",
+      "html": "<div class=\"ds-timer-btns\"><button class=\"ds-btn-ghost\">Reset</button><button class=\"ds-btn-solid\">Pause</button></div>",
+      "css": ".ds-timer-btns { display: flex; gap: 12px; width: 340px; } .ds-btn-ghost, .ds-btn-solid { flex: 1; padding: 12px; border-radius: 14px; font-family: Fraunces, Georgia, serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: opacity .15s; } .ds-btn-ghost { background: #FFF8EC; color: #2A1F1B; border: 1px solid rgba(42, 31, 27, 0.18); } .ds-btn-solid { background: #B87333; color: #FFF8EC; border: 1px solid transparent; } .ds-btn-ghost:active, .ds-btn-solid:active { opacity: .85; } .ds-btn-ghost:focus-visible, .ds-btn-solid:focus-visible { outline: 2px solid #B87333; outline-offset: 2px; }"
+    },
+    {
+      "name": "Save Preset Pill",
+      "kind": "chip",
+      "refersTo": "pill-save",
+      "description": "The only capsule. Unsaved on the left, saved on the right.",
+      "html": "<div class=\"ds-pills\"><button class=\"ds-pill\">Save as my morning</button><button class=\"ds-pill ds-pill-saved\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12L10 17L19 7\"/></svg>Saved as my morning</button></div>",
+      "css": ".ds-icon { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; } .ds-pills { display: flex; gap: 12px; } .ds-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 9999px; background: #FFF8EC; color: #2A1F1B; border: 1px solid rgba(42, 31, 27, 0.18); font-family: Fraunces, Georgia, serif; font-size: 13px; font-weight: 500; letter-spacing: -0.1px; cursor: pointer; transition: background .2s, color .2s, border-color .2s; } .ds-pill-saved { background: rgba(184, 115, 51, 0.12); color: #B87333; border-color: #B87333; } .ds-pill .ds-icon { width: 11px; height: 11px; stroke-width: 2.2; } .ds-pill:active { opacity: .85; } .ds-pill:focus-visible { outline: 2px solid #B87333; outline-offset: 2px; }"
+    },
+    {
+      "name": "Segmented Picker",
+      "kind": "input",
+      "refersTo": "segmented-picker",
+      "description": "Coffee | Water and °F | °C. Copper fills the selected segment.",
+      "html": "<div class=\"ds-seg\" role=\"radiogroup\"><button class=\"ds-seg-opt is-on\" role=\"radio\" aria-checked=\"true\">Coffee</button><button class=\"ds-seg-opt\" role=\"radio\" aria-checked=\"false\">Water</button></div>",
+      "css": ".ds-seg { display: inline-flex; padding: 3px; background: #FFF8EC; border: 1px solid rgba(42, 31, 27, 0.18); border-radius: 14px; } .ds-seg-opt { padding: 6px 12px; border: none; border-radius: 10px; background: transparent; color: #2A1F1B; font-family: -apple-system, system-ui, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: background .2s, color .2s; } .ds-seg-opt.is-on { background: #B87333; color: #FFF8EC; } .ds-seg-opt:focus-visible { outline: 2px solid #B87333; outline-offset: 2px; }"
+    },
+    {
+      "name": "Dose Dial",
+      "kind": "custom",
+      "refersTo": "stepper",
+      "description": "The 76pt numeral with steppers, over the measuring ruler and its copper marker.",
+      "html": "<div class=\"ds-dial\"><div class=\"ds-dial-top\"><div class=\"ds-dial-num\">20<span>g</span></div><div class=\"ds-steppers\"><button class=\"ds-stepper\" aria-label=\"Increase dose\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 5V19M5 12H19\"/></svg></button><button class=\"ds-stepper\" aria-label=\"Decrease dose\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12H19\"/></svg></button></div></div><div class=\"ds-ruler\" role=\"slider\" aria-valuenow=\"20\" aria-valuemin=\"10\" aria-valuemax=\"60\" tabindex=\"0\"><span class=\"ds-ruler-mark\"></span></div><div class=\"ds-dial-foot\"><em>at a ratio of <b>1:16</b></em><span>10g &#8212; 60g</span></div></div>",
+      "css": ".ds-icon { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; } .ds-dial { width: 340px; color: #2A1F1B; } .ds-dial-top { display: flex; align-items: flex-end; justify-content: space-between; } .ds-dial-num { font-family: Fraunces, Georgia, serif; font-size: 76px; letter-spacing: -3px; line-height: 1; font-variant-numeric: tabular-nums; } .ds-dial-num span { font-style: italic; font-size: 22px; letter-spacing: 0; color: #6B5239; margin-left: 6px; } .ds-steppers { display: flex; flex-direction: column; gap: 8px; } .ds-stepper { width: 44px; height: 44px; display: grid; place-items: center; background: #FFF8EC; color: #2A1F1B; border: 1px solid rgba(42, 31, 27, 0.18); border-radius: 14px; cursor: pointer; } .ds-stepper .ds-icon { width: 18px; height: 18px; stroke-width: 1.6; } .ds-stepper:active { opacity: .85; } .ds-stepper:focus-visible, .ds-ruler:focus-visible { outline: 2px solid #B87333; outline-offset: 2px; } .ds-ruler { position: relative; height: 34px; margin-top: 14px; background: linear-gradient(90deg, rgba(42, 31, 27, 0.85) 1px, transparent 1px) 0 6px / 34px 18px repeat-x, linear-gradient(90deg, rgba(42, 31, 27, 0.35) 1px, transparent 1px) 0 6px / 6.8px 9px repeat-x; } .ds-ruler-mark { position: absolute; top: 0; left: 61px; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 10px solid #B87333; transition: left .3s cubic-bezier(.3, 1.3, .5, 1); } .ds-dial-foot { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; } .ds-dial-foot em { font-family: Fraunces, Georgia, serif; font-size: 14px; color: #6B5239; } .ds-dial-foot b { font-style: normal; font-weight: 500; color: #B87333; } .ds-dial-foot span { font-family: -apple-system, system-ui, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #6B5239; }"
+    },
+    {
+      "name": "Roast Rows",
+      "kind": "card",
+      "refersTo": "row-selected",
+      "description": "Selectable rows. Selection adds Copper Tint, a Copper Rule stroke, and a 3pt mark.",
+      "html": "<button class=\"ds-row\" aria-pressed=\"false\"><span class=\"ds-row-mark\"></span><span class=\"ds-row-body\"><span class=\"ds-row-head\"><b>Light</b><i>&#8212; Bright · Floral</i><em>1:17</em></span><span class=\"ds-row-dek\">Bright, floral, tea-like. Origin flavors shine through.</span></span></button><button class=\"ds-row is-on\" aria-pressed=\"true\"><span class=\"ds-row-mark\"></span><span class=\"ds-row-body\"><span class=\"ds-row-head\"><b>Medium</b><i>&#8212; Balanced · Sweet</i><em>1:16</em></span><span class=\"ds-row-dek\">Balanced sweetness, clean body. The specialty sweet spot.</span></span></button>",
+      "css": ".ds-row { display: flex; width: 340px; margin-bottom: 8px; padding: 0; text-align: left; cursor: pointer; background: #FFF8EC; color: #2A1F1B; border: 1px solid rgba(42, 31, 27, 0.18); border-radius: 16px; transition: background .2s, border-color .2s; } .ds-row.is-on { background: rgba(184, 115, 51, 0.12); border-color: rgba(184, 115, 51, 0.42); } .ds-row-mark { width: 3px; margin: 12px 0; border-radius: 2px; background: transparent; } .ds-row.is-on .ds-row-mark { background: #B87333; } .ds-row-body { flex: 1; padding: 12px 12px 12px 14px; display: flex; flex-direction: column; gap: 4px; } .ds-row-head { display: flex; align-items: baseline; gap: 6px; font-family: Fraunces, Georgia, serif; } .ds-row-head b { font-size: 18px; font-weight: 500; letter-spacing: -0.3px; } .ds-row-head i { font-size: 11px; color: #6B5239; } .ds-row-head em { margin-left: auto; font-size: 18px; font-weight: 500; letter-spacing: -0.5px; color: #B87333; } .ds-row-dek { font-family: Fraunces, Georgia, serif; font-style: italic; font-size: 12px; color: #6B5239; } .ds-row:active { opacity: .85; } .ds-row:focus-visible { outline: 2px solid #B87333; outline-offset: 2px; }"
+    },
+    {
+      "name": "Masthead",
+      "kind": "custom",
+      "refersTo": "display",
+      "description": "Tracked-caps chrome, a 2pt over 1pt rule, and a title with one copper italic word.",
+      "html": "<header class=\"ds-mast\"><div class=\"ds-mast-chrome\"><span>PourCraft</span><span>The Brew</span></div><div class=\"ds-mast-rule\"></div><h1>The <em>Pour</em></h1><div class=\"ds-mast-foot\"><i>A calculator, set in type.</i><span>Est. 2024</span></div></header>",
+      "css": ".ds-mast { width: 340px; color: #2A1F1B; border-bottom: 1px solid rgba(42, 31, 27, 0.18); padding-bottom: 10px; } .ds-mast-chrome, .ds-mast-foot span { font-family: -apple-system, system-ui, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #6B5239; } .ds-mast-chrome { display: flex; justify-content: space-between; } .ds-mast-rule { margin-top: 10px; height: 2px; border-top: 2px solid rgba(42, 31, 27, 0.85); border-bottom: 1px solid rgba(42, 31, 27, 0.85); } .ds-mast h1 { margin: 14px 0 4px; font-family: Fraunces, Georgia, serif; font-size: 46px; font-weight: 400; letter-spacing: -2px; } .ds-mast h1 em { color: #B87333; } .ds-mast-foot { display: flex; justify-content: space-between; align-items: baseline; } .ds-mast-foot i { font-family: Fraunces, Georgia, serif; font-size: 14px; color: #6B5239; } .ds-mast-foot span { letter-spacing: 2px; font-weight: 600; }"
+    },
+    {
+      "name": "Section Header",
+      "kind": "custom",
+      "refersTo": "title",
+      "description": "Copper number, a stretching Copper Rule, a muted kicker, then a titled sentence.",
+      "html": "<div class=\"ds-sec\"><div class=\"ds-sec-head\"><b>No. 01</b><span class=\"ds-sec-rule\"></span><span>Three options</span></div><h2>Choose your roast.</h2></div>",
+      "css": ".ds-sec { width: 340px; } .ds-sec-head { display: flex; align-items: center; gap: 10px; font-family: -apple-system, system-ui, sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6B5239; font-weight: 600; } .ds-sec-head b { color: #B87333; font-weight: 700; } .ds-sec-rule { flex: 1; height: 1px; background: rgba(184, 115, 51, 0.42); } .ds-sec h2 { margin: 7px 0 10px; font-family: Fraunces, Georgia, serif; font-size: 21px; font-weight: 500; letter-spacing: -0.5px; color: #2A1F1B; }"
+    },
+    {
+      "name": "Pour Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Steamed Milk card with a hairline. The computed total leads as a 36pt Figure.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-line ds-line-big\"><span class=\"ds-line-label\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5.2 5.5H18.8L13 15H11Z M11 15V17.2H13V15 M8 19.5Q12 21.5 16 19.5 M7.5 5.5Q12 3.8 16.5 5.5\"/><path d=\"M8 8H16M9 11H15\" opacity=\".5\"/></svg><i>Total water</i></span><span class=\"ds-line-val\">320<small>g</small></span></div><hr><div class=\"ds-line\"><span class=\"ds-line-label\"><i>Bloom · 30 sec</i></span><span class=\"ds-line-val\">40<small>g</small></span></div><div class=\"ds-line\"><span class=\"ds-line-label\"><i>Remaining · spiral</i></span><span class=\"ds-line-val\">280<small>g</small></span></div></div>",
+      "css": ".ds-icon { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; } .ds-card { width: 340px; box-sizing: border-box; padding: 18px; background: #FFF8EC; color: #2A1F1B; border: 1px solid rgba(42, 31, 27, 0.18); border-radius: 18px; } .ds-card hr { border: none; height: 1px; background: rgba(42, 31, 27, 0.18); margin: 14px 0; } .ds-line { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; font-family: Fraunces, Georgia, serif; } .ds-line:last-child { margin-bottom: 0; } .ds-line-label { display: flex; align-items: center; gap: 12px; font-size: 14px; } .ds-line-big .ds-line-label { font-size: 18px; } .ds-line-label .ds-icon { width: 22px; height: 22px; stroke-width: 1.4; } .ds-line-val { font-size: 22px; font-weight: 500; letter-spacing: -1px; font-variant-numeric: tabular-nums; } .ds-line-big .ds-line-val { font-size: 36px; } .ds-line-val small { font-style: italic; font-weight: 400; font-size: 13px; letter-spacing: 0; color: #6B5239; margin-left: 4px; } .ds-line-big .ds-line-val small { font-size: 16px; }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-item-active",
+      "description": "Custom iPhone bar. The active tab turns copper on a 14pt Copper Tint plate. Glyph boxes stand in for the SF Symbols the app uses.",
+      "html": "<nav class=\"ds-tabs\"><button class=\"ds-tab is-on\" aria-current=\"page\"><span class=\"ds-tab-glyph\"></span>Brew</button><button class=\"ds-tab\"><span class=\"ds-tab-glyph\"></span>Guide</button><button class=\"ds-tab\"><span class=\"ds-tab-glyph\"></span>Tips</button><button class=\"ds-tab\"><span class=\"ds-tab-glyph\"></span>About</button></nav>",
+      "css": ".ds-tabs { display: flex; width: 360px; padding: 5px 8px; background: #FFF8EC; border-top: 1px solid rgba(42, 31, 27, 0.18); } .ds-tab { flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; border: none; border-radius: 14px; color: #6B5239; font-family: -apple-system, system-ui, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background .2s, color .2s; } .ds-tab-glyph { width: 17px; height: 17px; border-radius: 5px; background: currentColor; opacity: .9; } .ds-tab.is-on { background: rgba(184, 115, 51, 0.12); color: #B87333; } .ds-tab:focus-visible { outline: 2px solid #B87333; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Set in Type",
+    "overview": "PourCraft is a calculator typeset like a small coffee magazine. Every number the brewer acts on (the dose, the total water, the bloom) sits on the page the way a headline would. It's large, set in Fraunces, with tabular figures and tight tracking. Each screen is a page, with a masthead over a double ink rule, numbered sections, an italic dek, and a colophon at the back.\n\nThe system is quiet on purpose. Warm paper carries the page, and espresso ink carries the words. Copper marks what matters on each screen: the chosen ratio, the selected row, and the next action. Depth comes from 1pt hairlines and tonal fills. Controls read as part of the typography, so a stepper, a row, and a segment look like the same hand set them as the headline.\n\nDensity is comfortable. iPhone runs one column with 24pt margins, and iPad opens into a sidebar and two columns. Three looks are off the table: the utility calculator (gray system steppers, a form that happens to compute), faux-craft texture (paper grain, coffee rings, kraft backgrounds), and dashboard chrome (drop shadows, floating cards, charts, metric tiles).\n\nMotion stays small and physical. State changes use the `.snappy` spring, numbers roll with a numeric-text transition, and the timer's progress bar moves linearly, one second per tick. Brew-phase changes play a haptic when the setting is on.",
+    "keyCharacteristics": [
+      "Fraunces for every headline, numeral, and line of reading copy. System sans only for small chrome labels.",
+      "Warm paper and espresso ink in light mode, umber and crema in dark mode. No pure white or black.",
+      "Copper as a scarce signal: one italic word per page title, section numbers, ratios, selection, and the primary action.",
+      "Flat surfaces bounded by 1pt hairlines, with continuous corners from 2pt marks to 18pt cards.",
+      "Hand-drawn ink icons in page content. SF Symbols only in the tab bar and sidebar."
+    ],
+    "rules": [
+      {
+        "name": "The Copper Rarity Rule",
+        "body": "Copper fills only the primary action and the selected segment. Everywhere else it's type, a 3pt mark, a 42% rule, or a tint.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paper Rule",
+        "body": "No pure white and no pure black. The lightest value is Steamed Milk, and the darkest is Night Brew.",
+        "section": "colors"
+      },
+      {
+        "name": "The Typeset Numbers Rule",
+        "body": "Every number the brewer reads is Fraunces with tabular figures, and it changes with a numeric-text transition. The system sans never carries a value.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Italic Word Rule",
+        "body": "Each page title sets exactly one word in copper italic: \"The *Pour*,\" \"The *Method*.,\" \"Field *Notes*,\" and \"The *Colophon*.\"",
+        "section": "typography"
+      },
+      {
+        "name": "The Small Sans Rule",
+        "body": "The system sans appears only at caption sizes, in chrome: tracked uppercase labels, tab labels, and segment labels. Everything else is Fraunces.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "A boundary is a 1pt line. Shadows belong only to system-owned floating layers.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do set every value the brewer reads in Fraunces with tabular figures, and animate changes with a numeric-text transition.",
+      "Do give each page title exactly one copper italic word.",
+      "Do separate label parts with a middle dot (\"Bloom · 30 sec,\" \"Medium · 1:16\").",
+      "Do draw boundaries with a 1pt Hairline, and show selection with Copper Tint plus a 3pt copper mark.",
+      "Do reserve space for a selected state in advance, so selection never shifts text.",
+      "Do use `ViewThatFits` fallbacks so rows stack instead of truncating at large Dynamic Type sizes.",
+      "Do keep the tab bar, segmented picker, steppers, and On/Off rows custom, and build any new control (toggles, pickers, sheets, menus) from iOS system components tinted copper.",
+      "Do keep every tap target at least 44pt by 44pt."
+    ],
+    "donts": [
+      "Don't put a shadow on page content. Sheets, popovers, and menus use iOS system materials.",
+      "Don't fill anything with copper except the primary action and the selected segment.",
+      "Don't use pure white (#FFFFFF) or pure black (#000000).",
+      "Don't add paper grain, coffee-ring stains, kraft backgrounds, or any other faux-craft texture.",
+      "Don't let a screen drift toward a utility calculator, with gray system steppers or a form layout that happens to compute.",
+      "Don't add dashboard chrome: floating cards, drop shadows, charts, or metric tiles.",
+      "Don't set a value or sentence-case text in the system sans.",
+      "Don't put SF Symbols in page content. The body uses ink icons."
+    ]
+  }
+}

@@ -320,7 +320,7 @@ private struct MastheadSection: View {
             Credit(role: "Created by", person: "Vinny Carpenter", url: URL(string: "https://vinny.dev")),
             Credit(role: "Inspired by", person: "Kristin Carpenter", url: nil),
             Credit(role: "Developer", person: "Katie Carpenter", url: nil),
-            Credit(role: "Type", person: "Fraunces & Inter", url: nil)
+            Credit(role: "Type", person: "Fraunces & SF Pro", url: nil)
         ]
     }
 
