@@ -131,40 +131,61 @@ struct BrewModelTests {
 
     // MARK: - Temperature Display
 
-    @Test("Should display fahrenheit temperature range")
-    func shouldDisplayFahrenheitRange() {
+    @Test("Should display the roast's fahrenheit range",
+          arguments: [(Roast.light, "205\u{00B0} \u{2013} 210\u{00B0} F"),
+                      (Roast.medium, "200\u{00B0} \u{2013} 205\u{00B0} F"),
+                      (Roast.dark, "195\u{00B0} \u{2013} 200\u{00B0} F")])
+    func shouldDisplayFahrenheitRange(roast: Roast, expected: String) {
         let model = BrewModel()
+        model.selectedRoast = roast
         model.temperatureUnit = .fahrenheit
-        #expect(model.temperatureRange.contains("194"))
-        #expect(model.temperatureRange.contains("204"))
-        #expect(model.temperatureRange.contains("F"))
+        #expect(model.temperatureRange == expected)
     }
 
-    @Test("Should display celsius temperature range")
-    func shouldDisplayCelsiusRange() {
+    @Test("Should display the roast's celsius range",
+          arguments: [(Roast.light, "96\u{00B0} \u{2013} 99\u{00B0} C"),
+                      (Roast.medium, "93\u{00B0} \u{2013} 96\u{00B0} C"),
+                      (Roast.dark, "91\u{00B0} \u{2013} 93\u{00B0} C")])
+    func shouldDisplayCelsiusRange(roast: Roast, expected: String) {
         let model = BrewModel()
+        model.selectedRoast = roast
         model.temperatureUnit = .celsius
-        #expect(model.temperatureRange.contains("90"))
-        #expect(model.temperatureRange.contains("96"))
-        #expect(model.temperatureRange.contains("C"))
+        #expect(model.temperatureRange == expected)
+    }
+
+    // The calculator and field note 04 once disagreed; this keeps them in step.
+    @Test("Should match the ranges in the temperature field note", arguments: Roast.allCases)
+    func shouldMatchFieldNoteRanges(roast: Roast) throws {
+        let model = BrewModel()
+        model.selectedRoast = roast
+        model.temperatureUnit = .fahrenheit
+        let note = try #require(BrewTip.allTips.first { $0.id == "temp" })
+        let reference = try #require(note.references.first { $0.key == roast.displayName })
+        #expect(integers(in: model.temperatureRange) == integers(in: reference.value))
     }
 
     // MARK: - Temperature Point
 
-    @Test("Should report fahrenheit point as 200° F")
-    func shouldReportFahrenheitPoint() {
+    @Test("Should report the low end of the roast's range in fahrenheit",
+          arguments: [(Roast.light, "205\u{00B0} F"), (Roast.medium, "200\u{00B0} F"), (Roast.dark, "195\u{00B0} F")])
+    func shouldReportFahrenheitPoint(roast: Roast, expected: String) {
         let model = BrewModel()
+        model.selectedRoast = roast
         model.temperatureUnit = .fahrenheit
-        #expect(model.temperaturePoint.contains("200"))
-        #expect(model.temperaturePoint.contains("F"))
+        #expect(model.temperaturePoint == expected)
     }
 
-    @Test("Should report celsius point as 93° C")
-    func shouldReportCelsiusPoint() {
+    @Test("Should report the low end of the roast's range in celsius",
+          arguments: [(Roast.light, "96\u{00B0} C"), (Roast.medium, "93\u{00B0} C"), (Roast.dark, "91\u{00B0} C")])
+    func shouldReportCelsiusPoint(roast: Roast, expected: String) {
         let model = BrewModel()
+        model.selectedRoast = roast
         model.temperatureUnit = .celsius
-        #expect(model.temperaturePoint.contains("93"))
-        #expect(model.temperaturePoint.contains("C"))
+        #expect(model.temperaturePoint == expected)
+    }
+
+    private func integers(in text: String) -> [Int] {
+        text.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
     }
 
     // MARK: - Weight Formatting
