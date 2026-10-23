@@ -36,7 +36,7 @@ Shipped as of version 2.5.0:
 - Four tabs: Brew (the calculator), Guide (eight steps plus a live timer), Tips (eight field notes), and About (colophon, settings, and links). iPad replaces the tab bar with a sidebar.
 - Ratios are Light 1:17, Medium 1:16, and Dark 1:15. Bloom water is 2× the dose, rounded to a whole gram.
 - Coffee-first mode sets a dose from 10 to 60 g (default 20 g). Water-first mode sets 200 to 900 g in 10 g steps and derives the dose to 0.1 g. Switching modes carries the numbers across.
-- The Brew tab shows the selected roast's water temperature range from field note 04 (Light 205° to 210°F, Medium 200° to 205°F, Dark 195° to 200°F), with a °F/°C toggle. The Guide targets the low end of that range.
+- The Brew tab shows the selected roast's water temperature range from field note 04 (Light 205° to 210°F, Medium 200° to 205°F, Dark 195° to 200°F), with a °F/°C toggle. The Guide targets the low end of that range. Field note 04 is the source of record for these ranges (Vinny's decision, October 22, 2026).
 - The live timer runs through ready, bloom, pour, drawdown, and done. Settings cover haptic feedback on phase changes and auto-advancing Guide steps.
 - "Save as my morning" stores roast, mode, and amount, and restores them on launch.
 - Light and dark appearance.
@@ -56,7 +56,6 @@ Terminology used in the app:
 
 Open questions:
 
-- The per-roast temperature ranges in field note 04, which the Brew tab and Guide now share through `Roast.waterTemperatureF`, have no named source. Roaster guides agree on the direction (hotter for light, cooler for dark) but disagree on the numbers, most of all for dark roasts.
 - The field notes' reference cards are quick specs, such as "Target hardness: ~150 ppm," and they aren't citations. The repo has no source list yet, so the existing claims aren't traced.
 - Price and business model aren't recorded here.
 
