@@ -58,7 +58,6 @@ Open questions:
 
 - Field note 04 recommends 205° to 210°F for light roasts and 200° to 205°F for medium. The Brew tab shows one 194° to 204°F range for every roast (`BrewModel.swift`). One of them needs a source and a fix.
 - The field notes' reference cards are quick specs, such as "Target hardness: ~150 ppm," and they aren't citations. The repo has no source list yet, so the existing claims aren't traced.
-- The Masthead credit reads "Type: Fraunces & Inter," but only Fraunces ships. The sans is the system font.
 - Price and business model aren't recorded here.
 
 ## Brand Commitments
