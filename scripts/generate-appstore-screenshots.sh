@@ -172,8 +172,18 @@ repair_ipad_landscape_screenshots() {
         fail "iPad landscape screenshot has unexpected pre-rotation size: $size"
         ;;
     esac
+    clear_orientation_tag "$file"
   done
   shopt -u nullglob
+}
+
+# The landscape capture carries EXIF and XMP orientation tags, and sips keeps
+# them after rotating the pixels. Viewers that honor the tag then show the
+# screenshot sideways, so clear it once the pixels are upright.
+clear_orientation_tag() {
+  local file="$1"
+  exiftool -quiet -overwrite_original -EXIF:Orientation= -XMP:Orientation= "$file"
+  log "Cleared orientation tag on $(basename "$file")"
 }
 
 write_manifest() {
@@ -216,6 +226,9 @@ fi
 log "Using iPhone simulator: $IPHONE_DEVICE_NAME ($IPHONE_DEVICE_ID)"
 log "Using iPhone 6.3-inch simulator: $IPHONE_MEDIUM_DEVICE_NAME ($IPHONE_MEDIUM_DEVICE_ID)"
 log "Using iPad simulator: $IPAD_DEVICE_NAME ($IPAD_DEVICE_ID)"
+
+command -v exiftool >/dev/null 2>&1 \
+  || fail "exiftool is required to clear orientation tags on landscape screenshots (brew install exiftool)"
 
 log "Checking privacy URL"
 curl -fsSI "$PRIVACY_URL" >/dev/null
